@@ -60,7 +60,6 @@ CubeWidget::CubeWidget(QWidget* parent)
        scene(*this),
        keyStates(maxKeyCode, false)
 {
-
 }
 
 CubeWidget::~CubeWidget()

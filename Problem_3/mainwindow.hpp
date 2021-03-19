@@ -1,7 +1,6 @@
 #pragma once
 
 #include <QMainWindow>
-#include <QColorDialog>
 
 namespace Ui {
 class MainWindow;

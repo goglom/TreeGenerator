@@ -1,16 +1,14 @@
 TEMPLATE = app
 CONFIG += c++17
 QT += core gui widgets
-LIBS += -lopengl32
-
-TARGET = OpenGLSandbox
+TARGET = Problem3_4
 
 
 SOURCES += \
         cameraview.cpp \
         cubewidget.cpp \
         direcltylight.cpp \
-        keyboardstate.cpp \
+        keyboard.cpp \
         main.cpp \
         mainwindow.cpp \
         materialfactory.cpp \
@@ -34,7 +32,7 @@ HEADERS += \
     cameraview.hpp \
     cubewidget.hpp \
     direcltylight.hpp \
-    keyboardstate.hpp \
+    keyboard.hpp \
     lightsource.hpp \
     mainwindow.hpp \
     material.hpp \
