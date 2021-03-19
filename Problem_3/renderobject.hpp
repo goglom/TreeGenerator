@@ -1,5 +1,7 @@
 #pragma once
+
 #include "mesh.hpp"
+#include "object.hpp"
 
 #include <QOpenGLBuffer>
 #include <QOpenGLVertexArrayObject>
@@ -8,7 +10,7 @@
 
 #include <memory>
 
-class RenderObject
+class RenderObject : public Object
 {
     using VaoSPtr = std::shared_ptr<QOpenGLVertexArrayObject>;
 
@@ -40,5 +42,8 @@ public:
 
     QMatrix4x4& getModel();
     QMatrix4x4 const& getModel() const;
+
+    void offsetMove(QVector3D const& offset) override;
+    void moveTo(QVector3D const& position) override;
 };
 

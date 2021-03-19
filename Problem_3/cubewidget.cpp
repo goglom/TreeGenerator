@@ -79,7 +79,7 @@ void CubeWidget::mouseMoveEvent(QMouseEvent* event)
     if (event->buttons() & Qt::LeftButton){
         QVector2D diff = QVector2D(event->pos()) - mouseLastPosition;
         diff *= 0.001f;
-        camera.rotate(diff.x(), diff.y());
+        pCamera->rotate(diff.x(), diff.y());
     }
     mouseLastPosition = QVector2D(event->pos());
 }
@@ -103,22 +103,22 @@ void CubeWidget::moveProcess(float deltaTime)
     float length = cameraSpeed * deltaTime;
 
     if (keyStates.at(Qt::Key_W)){
-        camera.move(CameraView::directions::forward, length);
+        pDrivenObject->offsetMove(forward * length);
     }
     if (keyStates.at(Qt::Key_S)){
-        camera.move(CameraView::directions::backward, length);
+        pDrivenObject->offsetMove(backward * length);
     }
     if (keyStates.at(Qt::Key_D)){
-        camera.move(CameraView::directions::right, length);
+        pDrivenObject->offsetMove(rightward * length);
     }
     if (keyStates.at(Qt::Key_A)){
-        camera.move(CameraView::directions::left, length);
+        pDrivenObject->offsetMove(leftward * length);
     }
     if (keyStates.at(Qt::Key_Space)){
-        camera.move(CameraView::directions::up, length);
+        pDrivenObject->offsetMove(upward * length);
     }
     if (keyStates.at(Qt::Key_Z)){
-        camera.move(CameraView::directions::down, length);
+        pDrivenObject->offsetMove(downward * length);
     }
 }
 
@@ -141,13 +141,13 @@ QSize CubeWidget::minimumSizeHint() const
 
 void CubeWidget::initShaders()
 {
-    Q_ASSERT(objShader->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/GuroSceneObject.vert"));
-    Q_ASSERT(objShader->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/GuroSceneObject.frag"));
-    Q_ASSERT(objShader->link());
+    Q_ASSERT(pObjectShader->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/GuroSceneObject.vert"));
+    Q_ASSERT(pObjectShader->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/GuroSceneObject.frag"));
+    Q_ASSERT(pObjectShader->link());
 
-    Q_ASSERT(lightShader->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/LightSource.vert"));
-    Q_ASSERT(lightShader->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/GuroSceneObject.frag"));
-    Q_ASSERT(lightShader->link());
+    Q_ASSERT(pLightShader->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/LightSource.vert"));
+    Q_ASSERT(pLightShader->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/GuroSceneObject.frag"));
+    Q_ASSERT(pLightShader->link());
 }
 
 void CubeWidget::initializeGL()
@@ -158,7 +158,7 @@ void CubeWidget::initializeGL()
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
 
-    scene.initialize(objShader, lightShader);
+    scene.initialize(pObjectShader, pLightShader);
 
     QMatrix4x4 model;
     model.rotate(30, 0.f, 1.f);
@@ -218,30 +218,28 @@ void CubeWidget::initializeGL()
 //                        )
 //    );
 
-    camera.setZNear(zNear);
-    camera.setZFar(zFar);
+    pCamera->setZNear(zNear);
+    pCamera->setZFar(zFar);
     timer.start(deltaTimeMsec, this);
 }
 
-
-
 void CubeWidget::resizeGL(int w, int h)
 {
-    camera.setAspectRatio(float(w) / float(h ? h : 1));
+    pCamera->setAspectRatio(float(w) / float(h ? h : 1));
 }
 
 void CubeWidget::paintGL()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    camera.setFOV(fov);
+    pCamera->setFOV(fov);
 
-    objShader->bind();
-    objShader->setUniformValue("projView",camera.getProjViewMatrix());
-    objShader->setUniformValue("cameraPos", camera.cameraPosition());
+    pObjectShader->bind();
+    pObjectShader->setUniformValue("projView",pCamera->getProjViewMatrix());
+    pObjectShader->setUniformValue("cameraPos", pCamera->cameraPosition());
 
-    lightShader->bind();
-    lightShader->setUniformValue("projView",camera.getProjViewMatrix());
-    lightShader->setUniformValue("cameraPos", camera.cameraPosition());
+    pLightShader->bind();
+    pLightShader->setUniformValue("projView",pCamera->getProjViewMatrix());
+    pLightShader->setUniformValue("cameraPos", pCamera->cameraPosition());
 
     scene.renderAll();
 }

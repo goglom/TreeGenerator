@@ -1,7 +1,5 @@
 #include "renderobject.hpp"
 
-
-
 RenderObject::RenderObject(
         std::shared_ptr<Mesh> mesh,
         QMatrix4x4 const& model_matrix
@@ -10,7 +8,6 @@ RenderObject::RenderObject(
       modelMatrix_(model_matrix)
 {
 }
-
 
 void RenderObject::initialize(ShaderProgSPtr pShaderProgram)
 {
@@ -77,4 +74,14 @@ QMatrix4x4& RenderObject::getModel()
 QMatrix4x4 const& RenderObject::getModel() const
 {
     return modelMatrix_;
+}
+
+void RenderObject::offsetMove(const QVector3D& offset)
+{
+    getModel().translate(offset);
+}
+
+void RenderObject::moveTo(const QVector3D& position)
+{
+    getModel().setColumn(3, {position, 1.f});
 }

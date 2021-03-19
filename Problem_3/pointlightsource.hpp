@@ -23,5 +23,7 @@ public:
 
     void render(QOpenGLFunctions& functions) override;
     void uploadToShader(ShaderProgSPtr pShader, size_t index) override;
+
+
 };
 

@@ -39,6 +39,7 @@ HEADERS += \
     materialfactory.hpp \
     mesh.hpp \
     meshfactory.hpp \
+    object.hpp \
     pointlightsource.hpp \
     renderobject.hpp \
     scene.hpp \

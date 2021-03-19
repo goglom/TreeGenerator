@@ -78,36 +78,41 @@ void CameraView::setZFar(float zFar)
     zFar_ = zFar;
 }
 
-void CameraView::move(const QVector3D& offset)
+void CameraView::offsetMove(const QVector3D& offset)
 {
-    eye_pos_ += front_ * QVector3D::dotProduct(offset, front_);
-    eye_pos_ += up_ * QVector3D::dotProduct(offset, up_);
-    eye_pos_ += right_ * QVector3D::dotProduct(offset, right_);
+    eye_pos_ += front_ * offset.z();
+    eye_pos_ += up_  * offset.y();
+    eye_pos_ += right_ * offset.x();
 }
 
-void CameraView::move(CameraView::directions direction, float length)
+void CameraView::moveTo(const QVector3D& position)
 {
-    switch (direction) {
-    case directions::forward :
-        eye_pos_ += front_ * length;
-        break;
-    case directions::backward:
-        eye_pos_ -= front_ * length;
-        break;
-    case directions::right:
-        eye_pos_ += right_ * length;
-        break;
-    case directions::left:
-        eye_pos_ -= right_ * length;
-        break;
-    case directions::up:
-        eye_pos_ += up_ * length;
-        break;
-    case directions::down:
-        eye_pos_ -= up_ * length;
-        break;
-    }
+    eye_pos_ = position;
 }
+
+//void CameraView::move(CameraView::directions direction, float length)
+//{
+//    switch (direction) {
+//    case directions::forward :
+//        eye_pos_ += front_ * length;
+//        break;
+//    case directions::backward:
+//        eye_pos_ -= front_ * length;
+//        break;
+//    case directions::right:
+//        eye_pos_ += right_ * length;
+//        break;
+//    case directions::left:
+//        eye_pos_ -= right_ * length;
+//        break;
+//    case directions::up:
+//        eye_pos_ += up_ * length;
+//        break;
+//    case directions::down:
+//        eye_pos_ -= up_ * length;
+//        break;
+//    }
+//}
 
 void CameraView::rotate(float yaw, float pitch)
 {

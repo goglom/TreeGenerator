@@ -1,10 +1,12 @@
 #pragma once
 
+#include <object.hpp>
+
 #include <QVector3D>
 #include <QMatrix4x4>
 #include <cmath>
 
-class CameraView
+class CameraView final : public Object
 {
     QMatrix4x4 view_{};
     QMatrix4x4 projection_{};
@@ -31,15 +33,6 @@ class CameraView
 public:
     inline static constexpr bool constrainPitch = true;
 
-    enum class directions{
-        forward,
-        backward,
-        left,
-        right,
-        up,
-        down,
-    };
-
     CameraView(
             QVector3D const& eye_pos = {},
             QVector3D const& front = {0.f, 0.f, -1.f},
@@ -57,8 +50,9 @@ public:
     void setZNear(float zNear);
     void setZFar(float zFar);
 
-    void move(QVector3D const& offset);
-    void move(directions direction, float length);
+    void offsetMove(QVector3D const& offset) override;
+    void moveTo(QVector3D const& position) override;
+
     void rotate(float yaw, float pitch);
 
 };

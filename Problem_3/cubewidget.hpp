@@ -1,5 +1,7 @@
 #pragma once
 
+#define _ISC_ inline static constexpr
+
 #include "cameraview.hpp"
 #include "meshfactory.hpp"
 #include "materialfactory.hpp"
@@ -9,13 +11,17 @@
 #include "pointlightsource.hpp"
 
 #include <vector>
-
+#include <unordered_map>
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions>
 #include <QMatrix4x4>
 #include <QOpenGLShaderProgram>
 #include <QBasicTimer>
 #include <QColorDialog>
+
+
+template<class T>
+using sPtr = std::shared_ptr<T>;
 
 class CubeWidget : public QOpenGLWidget, protected QOpenGLFunctions
 {
@@ -27,14 +33,7 @@ public:
     CubeWidget(QWidget* parent = nullptr);
     ~CubeWidget();
 
-
-protected:
-    inline static constexpr int initSteps = 8;
-    inline static constexpr float initFov = 60.f;
-    inline static constexpr float zNear = 0.1;
-    inline static constexpr float zFar = 100.;
-    inline static constexpr std::size_t maxKeyCode = 0xff;
-    inline static constexpr unsigned deltaTimeMsec = 16;
+private:
 
     void mousePressEvent(QMouseEvent *e) override;
     void mouseMoveEvent(QMouseEvent* event) override;
@@ -50,15 +49,33 @@ protected:
     void moveProcess(float deltaTime);
     void initShaders();
 
+    _ISC_ int initSteps = 8;
+    _ISC_ float initFov = 60.f;
+    _ISC_ float zNear = 0.1;
+    _ISC_ float zFar = 100.;
+    _ISC_ std::size_t maxKeyCode = 0xff;
+    _ISC_ unsigned deltaTimeMsec = 16;
 
-private:
-    std::shared_ptr<QOpenGLShaderProgram> objShader =
+    _ISC_ QVector3D forward{0.f, 0.f, 1.f};
+    _ISC_ QVector3D upward{0.f, 1.f, 0.f};
+    _ISC_ QVector3D rightward{1.f, 0.f, 0.f};
+    _ISC_ QVector3D backward = -forward;
+    _ISC_ QVector3D leftward = -rightward;
+    _ISC_ QVector3D downward = -upward;
+
+
+    sPtr<QOpenGLShaderProgram> pObjectShader =
             std::make_shared<QOpenGLShaderProgram>();
-    std::shared_ptr<QOpenGLShaderProgram> lightShader =
+    sPtr<QOpenGLShaderProgram> pLightShader =
             std::make_shared<QOpenGLShaderProgram>();
 
     Scene scene;
-    CameraView camera{{0.f, 0.f, 5.f}};
+    sPtr<CameraView> pCamera
+        = std::make_shared<CameraView>(QVector3D{0.f, 0.f, 5.f});
+
+    sPtr<Object> pDrivenObject
+        = std::static_pointer_cast<Object>(pCamera);
+
     float cameraSpeed = 3.0;
 
     float aspectRatio;
