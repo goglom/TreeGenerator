@@ -12,7 +12,7 @@ class CameraView final : public Object
     QMatrix4x4 projection_{};
     QMatrix4x4 projView_{};
 
-    QVector3D eye_pos_;
+    QVector3D eyePos_;
     QVector3D up_;
     QVector3D front_;
     QVector3D right_;
@@ -42,6 +42,10 @@ public:
     QMatrix4x4 const& getProjectionMatrix();
     QMatrix4x4 const& getProjViewMatrix();
     const QVector3D& cameraPosition() const;
+    const QVector3D& front() const;
+    const QVector3D& up() const;
+    const QVector3D& right() const;
+
 
 
     void setProjection(float fov, float aspectRatio, float zNear, float zFar);

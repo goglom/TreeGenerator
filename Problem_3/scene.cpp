@@ -19,41 +19,41 @@ void Scene::initialize(Scene::ShaderProgramSptr object, Scene::ShaderProgramSptr
 void Scene::addPointLightSource(Scene::PointLightSourseSPtr light)
 {
     light->initialize(lightSourceShader_);
-    objects_.push_back(std::static_pointer_cast<RenderObject>(light));
-    pointLightSources_.push_back(std::move(light));
+    objects.push_back(std::static_pointer_cast<MeshObject>(light));
+    pointLightSources.push_back(std::move(light));
 
     objectShader_->bind();
-    objectShader_->setUniformValue("pointLightsCount", GLint(pointLightSources_.size()));
+    objectShader_->setUniformValue("pointLightsCount", GLint(pointLightSources.size()));
 }
 
 void Scene::addDirectlyLightSource(Scene::DirectlyLightSourseSPtr light)
 {
-    dirLightSources_.push_back(std::move(light));
+    dirLightSources.push_back(std::move(light));
 
     objectShader_->bind();
-    objectShader_->setUniformValue("dirLightsCount", GLint(dirLightSources_.size()));
+    objectShader_->setUniformValue("dirLightsCount", GLint(dirLightSources.size()));
 }
 
 void Scene::addRenderObject(Scene::RenderObjectSPtr object)
 {
     object->initialize(objectShader_);
-    objects_.push_back(std::move(object));
+    objects.push_back(std::move(object));
 }
 
 void Scene::renderAll()
 {
     objectShader_->bind();
-    objectShader_->setUniformValue("dirLightsCount", GLint(dirLightSources_.size()));
-    objectShader_->setUniformValue("pointLightsCount", GLint(pointLightSources_.size()));
+    objectShader_->setUniformValue("dirLightsCount", GLint(dirLightSources.size()));
+    objectShader_->setUniformValue("pointLightsCount", GLint(pointLightSources.size()));
 
 
-    for (size_t i = 0; i < pointLightSources_.size(); ++i){
-        pointLightSources_[i]->uploadToShader(objectShader_, i);
+    for (size_t i = 0; i < pointLightSources.size(); ++i){
+        pointLightSources[i]->uploadToShader(objectShader_, i);
     }
-    for (size_t i = 0; i < dirLightSources_.size(); ++i){
-        dirLightSources_[i]->uploadToShader(objectShader_, i);
+    for (size_t i = 0; i < dirLightSources.size(); ++i){
+        dirLightSources[i]->uploadToShader(objectShader_, i);
     }
-    for (auto& obj : objects_){
+    for (auto& obj : objects){
         obj->render(functions_);
     }
 }

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "lightsource.hpp"
-#include "renderobject.hpp"
+#include "meshobject.hpp"
 #include "pointlightsource.hpp"
 #include "direcltylight.hpp"
 
@@ -22,11 +22,11 @@ class Scene
     ShaderProgramSptr objectShader_;
     ShaderProgramSptr lightSourceShader_;
 
-    std::vector<PointLightSourseSPtr> pointLightSources_;
-    std::vector<DirectlyLightSourseSPtr> dirLightSources_;
-    std::vector<RenderObjectSPtr> objects_;
-
 public:
+    std::vector<PointLightSourseSPtr> pointLightSources;
+    std::vector<DirectlyLightSourseSPtr> dirLightSources;    
+    std::vector<RenderObjectSPtr> objects;
+
     Scene(QOpenGLFunctions& fucntions);
 
     void initialize(ShaderProgramSptr object,
@@ -36,5 +36,4 @@ public:
     void addDirectlyLightSource(DirectlyLightSourseSPtr light);
     void addRenderObject(RenderObjectSPtr object);
     void renderAll();
-
 };

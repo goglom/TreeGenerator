@@ -9,6 +9,8 @@
 #include "sceneobject.hpp"
 #include "direcltylight.hpp"
 #include "pointlightsource.hpp"
+#include "keyboard.hpp"
+#include "objectsgrid.hpp"
 
 #include <vector>
 #include <unordered_map>
@@ -33,8 +35,13 @@ public:
     CubeWidget(QWidget* parent = nullptr);
     ~CubeWidget();
 
-private:
+public slots:
+    void selectCamera();
+    void selectPointLights();
+    //void selectSpotLights();
 
+
+private:
     void mousePressEvent(QMouseEvent *e) override;
     void mouseMoveEvent(QMouseEvent* event) override;
     void keyPressEvent(QKeyEvent* event) override;
@@ -63,6 +70,13 @@ private:
     _ISC_ QVector3D leftward = -rightward;
     _ISC_ QVector3D downward = -upward;
 
+
+    Keyboard keyboard{Qt::Key_W, Qt::Key_A, Qt::Key_S, Qt::Key_D, Qt::Key_Z, Qt::Key_Space,
+                     Qt::Key_Up, Qt::Key_Down, Qt::Key_Left, Qt::Key_Right,
+                     Qt::Key_Slash, Qt::Key_Greater};
+
+    sPtr<Object> pPointLightObject{};
+    size_t pointLightObjectNum = 0;
 
     sPtr<QOpenGLShaderProgram> pObjectShader =
             std::make_shared<QOpenGLShaderProgram>();

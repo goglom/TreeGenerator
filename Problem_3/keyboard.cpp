@@ -1,18 +1,31 @@
 #include "keyboard.hpp"
 
 
-bool Keyboard::getKeyState(Qt::Key key)
+Keyboard::Keyboard(std::initializer_list<int> trackedKeys)
 {
-    if (key >= maxKey)
+    for (auto key : trackedKeys){
+        keysState[key] = false;
+    }
+}
+
+bool Keyboard::getKeyState(int key)
+{
+    if (keysState.find(key) == keysState.end())
         return false;
 
     return keysState[key];
 }
 
-void Keyboard::setKeyState(Qt::Key key, bool state)
+bool Keyboard::operator[](int key)
 {
-    if (key >= maxKey)
+    return getKeyState(key);
+}
+
+void Keyboard::setKeyState(int key, bool state)
+{
+    if (keysState.find(key) == keysState.end())
         return;
 
     keysState[key] = state;
 }
+

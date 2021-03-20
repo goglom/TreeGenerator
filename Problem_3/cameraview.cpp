@@ -17,18 +17,17 @@ CameraView::CameraView(
         const QVector3D& front,
         const QVector3D& up
         )
-    : eye_pos_(eye_pos),
+    : eyePos_(eye_pos),
       front_(front),
       worldUp_(up)
 {
     updateVectors();
 }
 
-
 QMatrix4x4 const& CameraView::getViewMatrix()
 {
     view_.setToIdentity();
-    view_.lookAt(eye_pos_, eye_pos_ + front_, up_);
+    view_.lookAt(eyePos_, eyePos_ + front_, up_);
     return view_;
 }
 
@@ -47,7 +46,22 @@ const QMatrix4x4& CameraView::getProjViewMatrix()
 
 const QVector3D& CameraView::cameraPosition() const
 {
-    return eye_pos_;
+    return eyePos_;
+}
+
+const QVector3D& CameraView::front() const
+{
+    return front_;
+}
+
+const QVector3D& CameraView::up() const
+{
+    return up_;
+}
+
+const QVector3D& CameraView::right() const
+{
+    return right_;
 }
 
 void CameraView::setProjection(float fov, float aspectRatio, float zNear, float zFar)
@@ -80,39 +94,15 @@ void CameraView::setZFar(float zFar)
 
 void CameraView::offsetMove(const QVector3D& offset)
 {
-    eye_pos_ += front_ * offset.z();
-    eye_pos_ += up_  * offset.y();
-    eye_pos_ += right_ * offset.x();
+    eyePos_ += front_ * offset.z();
+    eyePos_ += up_  * offset.y();
+    eyePos_ += right_ * offset.x();
 }
 
 void CameraView::moveTo(const QVector3D& position)
 {
-    eye_pos_ = position;
+    eyePos_ = position;
 }
-
-//void CameraView::move(CameraView::directions direction, float length)
-//{
-//    switch (direction) {
-//    case directions::forward :
-//        eye_pos_ += front_ * length;
-//        break;
-//    case directions::backward:
-//        eye_pos_ -= front_ * length;
-//        break;
-//    case directions::right:
-//        eye_pos_ += right_ * length;
-//        break;
-//    case directions::left:
-//        eye_pos_ -= right_ * length;
-//        break;
-//    case directions::up:
-//        eye_pos_ += up_ * length;
-//        break;
-//    case directions::down:
-//        eye_pos_ -= up_ * length;
-//        break;
-//    }
-//}
 
 void CameraView::rotate(float yaw, float pitch)
 {

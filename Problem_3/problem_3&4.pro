@@ -11,10 +11,10 @@ SOURCES += \
         keyboard.cpp \
         main.cpp \
         mainwindow.cpp \
-        materialfactory.cpp \
         meshfactory.cpp \
+        meshobject.cpp \
+        objectsgrid.cpp \
         pointlightsource.cpp \
-        renderobject.cpp \
         scene.cpp \
         sceneobject.cpp
 
@@ -39,7 +39,9 @@ HEADERS += \
     materialfactory.hpp \
     mesh.hpp \
     meshfactory.hpp \
+    meshobject.hpp \
     object.hpp \
+    objectsgrid.hpp \
     pointlightsource.hpp \
     renderobject.hpp \
     scene.hpp \

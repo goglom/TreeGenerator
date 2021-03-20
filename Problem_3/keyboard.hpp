@@ -1,16 +1,16 @@
 #pragma once
-#include <array>
-#include <Qt>
+#include <unordered_map>
+#include <QKeyEvent>
 
 class Keyboard
 {   
 public:
-    inline static constexpr int maxKey = 0xff;
-    bool getKeyState(Qt::Key key);
-    void setKeyState(Qt::Key key, bool state);
-
+    Keyboard(std::initializer_list<int> trackedKeys);
+    bool getKeyState(int key);
+    bool operator[](int key);
+    void setKeyState(int key, bool state);
 
 private:
-    std::array<bool, maxKey> keysState{false};
+    std::unordered_map<int, bool> keysState;
 };
 

@@ -1,6 +1,6 @@
 #version 450
 uniform highp mat4 model;
-uniform highp mat3 normModel;
+uniform highp mat4 normModel;
 uniform highp mat4 projView;
 uniform highp vec3 cameraPos;
 
@@ -42,9 +42,9 @@ vec3 CalcDirLight(DirLightSource light, vec3 normal, vec3 toEye)
     float diff = max(dot(normal, lightDir), 0.0);
     // specular shading
     vec3 reflectDir = reflect(-lightDir, normal);
-    float spec = pow(max(dot(toEye, reflectDir), 0.0), material.shininess);
+    float spec = pow(max(dot(toEye, reflectDir), 0.0), material.shininess) * sign(diff);
     // combine results
-    vec3 ambient  = light.color  * material.ambient;
+    vec3 ambient  = light.color * material.ambient;
     vec3 diffuse  = light.color * diff * material.diffuse;
     vec3 specular = light.color * spec * material.specular;
     return light.intensity * (ambient + diffuse + specular);
@@ -57,17 +57,16 @@ vec3 CalcPointLight(PointLightSource light, vec3 normal, vec3 vertexPos, vec3 to
     float diff = max(dot(normal, lightDir), 0.0);
     // specular shading
     vec3 reflectDir = reflect(-lightDir, normal);
-    float spec = pow(max(dot(toEye, reflectDir), 0.0), material.shininess);
+    float spec = pow(max(dot(toEye, reflectDir), 0.0), material.shininess) * sign(diff);
     // attenuation
     float distance = length(light.position - vertexPos);
     float attenuation = 1.0 / (light.constFactor + light.linFactor * distance +
                              light.quadFactor * distance * distance);
     // combine results
-    vec3 ambient  = light.color * material.ambient;
     vec3 diffuse  = light.color * diff * material.diffuse;
     vec3 specular = light.color * spec * material.specular;
 
-    return attenuation * light.intensity * (ambient + diffuse + specular);
+    return light.intensity * attenuation * (diffuse + specular);
 }
 
 layout (location = 0) in highp vec3 position;
@@ -77,9 +76,9 @@ out lowp vec4 vertexColor;
 
 void main()
 {
-    vec3 norm = normModel * normal;
-    norm = normalize(norm);
-    vec3 toEye = normalize(cameraPos - position);
+    vec3 norm = normalize(mat3(normModel) * normal);
+    vec4 worldVertexPos = model * vec4(position, 1.f);
+    vec3 toEye = normalize(cameraPos - worldVertexPos.xyz);
     vec3 resultCol = vec3(0.0);
 
     for (int i = 0; i < min(dirLightsCount, 10); ++i)
@@ -88,9 +87,9 @@ void main()
     }
     for (int i = 0; i < min(pointLightsCount, 10); ++i)
     {
-        resultCol += CalcPointLight(pointLights[i], norm, position, toEye);
+        resultCol += CalcPointLight(pointLights[i], norm, worldVertexPos.xyz, toEye);
     }
 
     vertexColor = vec4(resultCol, 1.0);
-    gl_Position = projView * model * vec4(position, 1.f);
+    gl_Position = projView * worldVertexPos;
 }

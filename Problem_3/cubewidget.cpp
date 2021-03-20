@@ -67,6 +67,16 @@ CubeWidget::~CubeWidget()
     makeCurrent();
 }
 
+void CubeWidget::selectCamera()
+{
+    pDrivenObject = pCamera;
+}
+
+void CubeWidget::selectPointLights()
+{
+    pDrivenObject = pPointLightObject;
+}
+
 void CubeWidget::mousePressEvent(QMouseEvent *e)
 {
     if (e->buttons() & Qt::LeftButton){
@@ -86,46 +96,44 @@ void CubeWidget::mouseMoveEvent(QMouseEvent* event)
 
 void CubeWidget::keyPressEvent(QKeyEvent* event)
 {
-    if (event->key() < keyStates.size()){
-        keyStates[event->key()] = true;
-    }
+    keyboard.setKeyState(event->key(), true);
 }
 
 void CubeWidget::keyReleaseEvent(QKeyEvent* event)
 {
-    if (event->key() < keyStates.size()){
-        keyStates[event->key()] = false;
-    }
+    keyboard.setKeyState(event->key(), false);
 }
 
 void CubeWidget::moveProcess(float deltaTime)
 {
     float length = cameraSpeed * deltaTime;
+    QVector3D direction;
 
-    if (keyStates.at(Qt::Key_W)){
-        pDrivenObject->offsetMove(forward * length);
+    if (keyboard[Qt::Key_W]){
+        direction += forward;
     }
-    if (keyStates.at(Qt::Key_S)){
-        pDrivenObject->offsetMove(backward * length);
+    if (keyboard[Qt::Key_S]){
+        direction += backward;
     }
-    if (keyStates.at(Qt::Key_D)){
-        pDrivenObject->offsetMove(rightward * length);
+    if (keyboard[Qt::Key_D]){
+        direction += rightward;
     }
-    if (keyStates.at(Qt::Key_A)){
-        pDrivenObject->offsetMove(leftward * length);
+    if (keyboard[Qt::Key_A]){
+        direction += leftward;
     }
-    if (keyStates.at(Qt::Key_Space)){
-        pDrivenObject->offsetMove(upward * length);
+    if (keyboard[Qt::Key_Space]){
+        direction += upward;
     }
-    if (keyStates.at(Qt::Key_Z)){
-        pDrivenObject->offsetMove(downward * length);
+    if (keyboard[Qt::Key_Z]){
+        direction += downward;
     }
+    pDrivenObject->offsetMove(direction * length);
 }
 
 void CubeWidget::wheelEvent(QWheelEvent* ev)
 {
     fov += ev->angleDelta().y() / 60.f;
-    fov = std::clamp(fov, 10.f, std::numeric_limits<float>::infinity());
+    fov = std::clamp(fov, 10.f, 150.f);
 }
 
 void CubeWidget::timerEvent(QTimerEvent*)
@@ -161,62 +169,40 @@ void CubeWidget::initializeGL()
     scene.initialize(pObjectShader, pLightShader);
 
     QMatrix4x4 model;
-    model.rotate(30, 0.f, 1.f);
-
-    scene.addRenderObject(std::make_shared<SceneObject>(
-                              MeshFactory::makeCube({1, 1, 1}, 50),
-                   model,
-                   MaterialFactory::makeGlod()
-                   )
-    );
-
-    model.setToIdentity();
-    model.translate(0.f, 0.f, -5.f);
-    model.rotate(30, 0.f, 1.f);
-    model.rotate(30, 1.f, 0.f);
-    scene.addRenderObject(std::make_shared<SceneObject>(
-                              MeshFactory::makeCube({2.f, 2.f, 2.f}, 50),
-                              model,
-                              MaterialFactory::makeCyanPlastic()
-                              )
+    auto baseObject = std::make_shared<SceneObject>(
+                          MeshFactory::makeCube({1, 1, 1}, 20),
+                          model,
+                          MaterialFactory::makeGlod()
                           );
 
-//    scene.addDirectlyLightSource(std::make_shared<DirecltyLight>(
-//                        QVector3D(1.f, 1.f, 1.f),
-//                        0.5f,
-//                        QVector3D(0.f, -1.f, 0.f)
-//                        )
-//    );
+    auto copy = baseObject->clone();
+    copy->offsetMove({4, 0, 0});
+
+
+    //scene.addRenderObject(baseObject);
+    //scene.addRenderObject(copy);
+
+
+    auto grid = std::make_shared<ObjectsGrid>(baseObject, 2.f, 10, 10);
+    scene.addRenderObject(grid);
+
     model.setToIdentity();
     model.translate(0.f, 0.f, 2.f);
+    auto pointLightSource = std::make_shared<PointLightSource>(MeshFactory::makeCube({0.1, 0.1, 0.1f}),
+                                                model, QVector3D{1.f, 1.f, 1.f}, 2.f);
 
-    scene.addPointLightSource(
-                std::make_shared<PointLightSource>(
-                    MeshFactory::makeCube({0.1, 0.1, 0.1f}),
-                    model,
-                    QVector3D{1.f, 1.f, 1.f},
-                    1.f,
-                    1.f,
-                    0.1f,
-                    0.5)
-                );
+    scene.addDirectlyLightSource(std::make_shared<DirecltyLight>(QVector3D(1, 1, 1), 0.1f, QVector3D(0, -1, 1)));
+
+    scene.addPointLightSource(pointLightSource);
+
+
     model.setToIdentity();
     model.translate(0.f, 2.f, -3.f);
 
-//    scene.addPointLightSource(
-//                std::make_shared<PointLightSource>(
-//                    MeshFactory::makeCube({0.1, 0.1, 0.1f}),
-//                    model,
-//                    QVector3D{1.f, 0.1f, 0.1f},
-//                    8.f)
-//                );
 
-//    scene.addDirectlyLightSource(std::make_shared<DirecltyLight>(
-//                        QColor(255, 255, 255),
-//                        0.1f,
-//                        QVector3D(1.f, 0.0f, -1.f)
-//                        )
-//    );
+
+    pPointLightObject = scene.pointLightSources[pointLightObjectNum];
+
 
     pCamera->setZNear(zNear);
     pCamera->setZFar(zFar);

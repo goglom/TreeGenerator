@@ -1,11 +1,11 @@
 #pragma once
 
-#include "renderobject.hpp"
+#include "meshobject.hpp"
 #include "material.hpp"
 
 #include <QMatrix4x4>
 
-class SceneObject : public RenderObject
+class SceneObject : public MeshObject
 {
     using MaterialSPrt = std::shared_ptr<Material>;
     MaterialSPrt material_;
@@ -17,6 +17,6 @@ public:
                 MaterialSPrt material
                 );
     void render(QOpenGLFunctions& functions) override;
-
+    RenderObjectSPtr clone() const override;
 };
 
