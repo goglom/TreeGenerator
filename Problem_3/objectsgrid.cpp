@@ -45,6 +45,12 @@ void ObjectsGrid::setColums(size_t columns)
     update();
 }
 
+void ObjectsGrid::setStepLength(float length)
+{
+    stepLength_ = length;
+    update();
+}
+
 void ObjectsGrid::render(QOpenGLFunctions& functions)
 {
     for (auto& row: grid_){

@@ -27,6 +27,11 @@ signals:
     void DirLightColorChanged(QColor const&);
     void PointLightColorChanged(QColor const&);
     void SpotLightColorChanged(QColor const&);
+    void PointLightIntensityChanged(float);
+    void PointLightConstChanged(float);
+    void PointLightLinChanged(float);
+    void PointLightQuadChanged(float);
+
 
 public slots:
     void setShininessVal(float);
@@ -45,6 +50,14 @@ private slots:
     void on_DirLightZSpinBox_valueChanged(double arg1);
     void on_DirLightColorButton_clicked();
     void on_PointLightColorButton_clicked();
+
+    void on_PointLightConstSpinBox_valueChanged(double arg1);
+
+    void on_PointLightLinSpinBox_valueChanged(double arg1);
+
+    void on_PointLightQuadSpinBox_valueChanged(double arg1);
+
+    void on_PointLightIntensitySlider_valueChanged(int value);
 
 private:
     enum class LightSources{

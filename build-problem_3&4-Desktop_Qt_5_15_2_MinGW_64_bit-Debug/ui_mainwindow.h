@@ -11,6 +11,8 @@
 
 #include <QtCore/QVariant>
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QDoubleSpinBox>
+#include <QtWidgets/QFrame>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QMainWindow>
@@ -40,6 +42,9 @@ public:
     QLabel *label_2;
     QSlider *horizontalSlider;
     QLabel *label;
+    QFrame *line;
+    QLabel *label_4;
+    QDoubleSpinBox *doubleSpinBox;
     QPushButton *SceneOptionsButton;
 
     void setupUi(QMainWindow *MainWindow)
@@ -104,6 +109,9 @@ public:
 
         horizontalSlider = new QSlider(centralwidget);
         horizontalSlider->setObjectName(QString::fromUtf8("horizontalSlider"));
+        horizontalSlider->setMinimum(1);
+        horizontalSlider->setMaximum(100);
+        horizontalSlider->setValue(4);
         horizontalSlider->setOrientation(Qt::Horizontal);
 
         horizontalLayout->addWidget(horizontalSlider);
@@ -112,6 +120,27 @@ public:
         label->setObjectName(QString::fromUtf8("label"));
 
         horizontalLayout->addWidget(label);
+
+        line = new QFrame(centralwidget);
+        line->setObjectName(QString::fromUtf8("line"));
+        line->setFrameShape(QFrame::VLine);
+        line->setFrameShadow(QFrame::Sunken);
+
+        horizontalLayout->addWidget(line);
+
+        label_4 = new QLabel(centralwidget);
+        label_4->setObjectName(QString::fromUtf8("label_4"));
+
+        horizontalLayout->addWidget(label_4);
+
+        doubleSpinBox = new QDoubleSpinBox(centralwidget);
+        doubleSpinBox->setObjectName(QString::fromUtf8("doubleSpinBox"));
+        doubleSpinBox->setMinimum(1.000000000000000);
+        doubleSpinBox->setMaximum(100.000000000000000);
+        doubleSpinBox->setSingleStep(1.000000000000000);
+        doubleSpinBox->setValue(1.000000000000000);
+
+        horizontalLayout->addWidget(doubleSpinBox);
 
         SceneOptionsButton = new QPushButton(centralwidget);
         SceneOptionsButton->setObjectName(QString::fromUtf8("SceneOptionsButton"));
@@ -126,6 +155,8 @@ public:
         retranslateUi(MainWindow);
         QObject::connect(CameraButton, SIGNAL(clicked()), Scene, SLOT(selectCamera()));
         QObject::connect(radioButton_2, SIGNAL(clicked()), Scene, SLOT(selectPointLight()));
+        QObject::connect(horizontalSlider, SIGNAL(valueChanged(int)), label, SLOT(setNum(int)));
+        QObject::connect(horizontalSlider, SIGNAL(valueChanged(int)), Scene, SLOT(setGridSteps(int)));
 
         QMetaObject::connectSlotsByName(MainWindow);
     } // setupUi
@@ -137,7 +168,8 @@ public:
         CameraButton->setText(QCoreApplication::translate("MainWindow", "Camera", nullptr));
         radioButton_2->setText(QCoreApplication::translate("MainWindow", "Point Light", nullptr));
         label_2->setText(QCoreApplication::translate("MainWindow", "Object number", nullptr));
-        label->setText(QCoreApplication::translate("MainWindow", "TextLabel", nullptr));
+        label->setText(QCoreApplication::translate("MainWindow", "4", nullptr));
+        label_4->setText(QCoreApplication::translate("MainWindow", "Grid step", nullptr));
         SceneOptionsButton->setText(QCoreApplication::translate("MainWindow", "Scene options", nullptr));
     } // retranslateUi
 

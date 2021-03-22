@@ -38,6 +38,15 @@ MainWindow::MainWindow(QWidget *parent) :
 
     QObject::connect(dialog, &Dialog::DirLightDirectionChanged,
                      ui->Scene, &SceneWidget::setDirDirection);
+
+    QObject::connect(dialog, &Dialog::PointLightIntensityChanged,
+                     ui->Scene, &SceneWidget::setPointInt);
+    QObject::connect(dialog, &Dialog::PointLightConstChanged,
+                     ui->Scene, &SceneWidget::setPointConst);
+    QObject::connect(dialog, &Dialog::PointLightLinChanged,
+                     ui->Scene, &SceneWidget::setPointLin);
+    QObject::connect(dialog, &Dialog::PointLightQuadChanged,
+                     ui->Scene, &SceneWidget::setPointQuad);
 }
 
 MainWindow::~MainWindow()
@@ -50,4 +59,9 @@ MainWindow::~MainWindow()
 void MainWindow::on_SceneOptionsButton_clicked()
 {
     dialog->show();
+}
+
+void MainWindow::on_doubleSpinBox_valueChanged(double arg1)
+{
+    ui->Scene->setGridStepLen(arg1);
 }

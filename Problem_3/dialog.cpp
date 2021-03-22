@@ -131,3 +131,27 @@ void Dialog::on_PointLightColorButton_clicked()
     lightSource = LightSources::Point;
     colorDialog->show();
 }
+
+void Dialog::on_PointLightConstSpinBox_valueChanged(double arg1)
+{
+    emit PointLightConstChanged(arg1);
+}
+
+void Dialog::on_PointLightLinSpinBox_valueChanged(double arg1)
+{
+    emit PointLightLinChanged(arg1);
+}
+
+void Dialog::on_PointLightQuadSpinBox_valueChanged(double arg1)
+{
+    emit PointLightQuadChanged(arg1);
+}
+
+void Dialog::on_PointLightIntensitySlider_valueChanged(int value)
+{
+    float range = ui->PointLightIntensitySlider->maximum() - ui->PointLightIntensitySlider->minimum();
+    float res = value / range;
+    ui->PointLightIntensityVal->setText(QString::number(res, 'f', 2));
+
+    emit PointLightIntensityChanged(res);
+}

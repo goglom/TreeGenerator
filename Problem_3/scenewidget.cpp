@@ -96,39 +96,29 @@ void SceneWidget::setDirColor(const QColor& color)
     pDirLight->color = getGlColor(color);
 }
 
-void SceneWidget::switchPoint(bool on)
-{
-
-}
-
 void SceneWidget::setPointConst(float constant)
 {
-
+    pPointLight->constFactor = constant;
 }
 
 void SceneWidget::setPointLin(float linear)
 {
-
+    pPointLight->linFactor = linear;
 }
 
 void SceneWidget::setPointQuad(float quadric)
 {
-
+    pPointLight->quadFactor = quadric;
 }
 
 void SceneWidget::setPointInt(float intensity)
 {
-
+    pPointLight->intensity = intensity;
 }
 
 void SceneWidget::setPointColor(const QColor& color)
 {
     pPointLight->color = getGlColor(color);
-}
-
-void SceneWidget::switchSpot(bool on)
-{
-
 }
 
 void SceneWidget::setSpotConst(float constant)
@@ -182,6 +172,17 @@ void SceneWidget::selectPointLight()
     pDrivenObject = pPointLight;
 }
 
+void SceneWidget::setGridSteps(int steps)
+{
+    pObjectsGrid->setColums(steps);
+    pObjectsGrid->setRows(steps);
+}
+
+void SceneWidget::setGridStepLen(float length)
+{
+    pObjectsGrid->setStepLength(length);
+}
+
 void SceneWidget::setMaterialAmbient(float val)
 {
     ambientFac = val;
@@ -203,11 +204,6 @@ void SceneWidget::setMaterialSpecular(float val)
 void SceneWidget::setMaterialShininess(float val)
 {
     pMaterial->shininess = val;
-}
-
-void SceneWidget::switchDir(bool on)
-{
-
 }
 
 void SceneWidget::setDirDirection(QVector3D dir)
@@ -337,18 +333,18 @@ void SceneWidget::initializeGL()
     auto copy = baseObject->clone();
     copy->offsetMove({4, 0, 0});
 
-    auto grid = std::make_shared<ObjectsGrid>(baseObject, 2.f, 4, 4);
-    scene.addRenderObject(grid);
+    pObjectsGrid = std::make_shared<ObjectsGrid>(baseObject, GridStepLength, 4, 4);
+    scene.addRenderObject(pObjectsGrid);
     model.setToIdentity();
     model.translate(0.f, 0.f, 2.f);
-    pPointLight = std::make_shared<PointLightSource>(MeshFactory::makeCube({0.1, 0.1, 0.1f}),
-                                                model, QVector3D{1.f, 1.f, 1.f}, 2.f);
+    pPointLight = std::make_shared<PointLightSource>(
+                      MeshFactory::makeCube({0.1, 0.1, 0.1f}),
+                      model, QVector3D{1.f, 1.f, 1.f}, 2.f
+                      );
 
     scene.addPointLightSource(pPointLight);
-
     pDirLight = std::make_shared<DirecltyLight>(QVector3D(1, 1, 1), DirLightIntensity, DirLightDirection);
     scene.addDirectlyLightSource(pDirLight);
-
 
     pSpotLight = std::make_shared<SpotLightSource>(pCamera->cameraPosition(), pCamera->front());
     scene.addSpotLightSource(pSpotLight);

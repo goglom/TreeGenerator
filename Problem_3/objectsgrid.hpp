@@ -25,6 +25,7 @@ public:
                 );
     void setRows(size_t rows);
     void setColums(size_t columns);
+    void setStepLength(float length);
 
     void render(QOpenGLFunctions& functions) override;
     void initialize(std::shared_ptr<QOpenGLShaderProgram> pShaderProgram) override;

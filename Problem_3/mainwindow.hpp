@@ -19,6 +19,8 @@ public:
 private slots:
     void on_SceneOptionsButton_clicked();
 
+    void on_doubleSpinBox_valueChanged(double arg1);
+
 private:
     Ui::MainWindow *ui;
     Dialog* dialog;

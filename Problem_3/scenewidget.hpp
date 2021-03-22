@@ -44,24 +44,25 @@ public slots:
     void selectPointLight();
 
 
+    void setGridSteps(int steps);
+    void setGridStepLen(float length);
+
     void setMaterialAmbient(float val);
     void setMaterialDiffuse(float val);
     void setMaterialSpecular(float val);
     void setMaterialShininess(float val);
 
-    void switchDir(bool on);
+
     void setDirDirection(QVector3D dir);
     void setDirInt(float intensity);
     void setDirColor(QColor const& color);
 
-    void switchPoint(bool on);
     void setPointConst(float constant);
     void setPointLin(float linear);
     void setPointQuad(float quadric);
     void setPointInt(float intensity);
     void setPointColor(QColor const& color);
 
-    void switchSpot(bool on);
     void setSpotConst(float constant);
     void setSpotLin(float linear);
     void setSpotQuad(float quadric);
@@ -104,6 +105,7 @@ private:
     _ISC_ QVector3D leftward = -rightward;
     _ISC_ QVector3D downward = -upward;
     _ISC_ size_t GridSteps = 50;
+    _ISC_ float GridStepLength = 1.f;
     _ISC_ float DirLightIntensity = 0.1;
     _ISC_ QVector3D DirLightDirection{0, -1, 0};
 
@@ -120,7 +122,7 @@ private:
     float specularFac = 1.f;
 
     sPtr<DirecltyLight> pDirLight{};
-
+    sPtr<ObjectsGrid> pObjectsGrid{};
 
     sPtr<PointLightSource> pPointLight{};
 
