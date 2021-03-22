@@ -48,43 +48,190 @@
 **
 ****************************************************************************/
 
-#include "cubewidget.hpp"
+#include "scenewidget.hpp"
 
 #include <QMouseEvent>
 #include <iostream>
 #include <cmath>
 
+namespace{
 
-CubeWidget::CubeWidget(QWidget* parent)
+QVector3D getGlColor(QColor const& color){
+    QVector3D result;
+    result.setX(color.redF());
+    result.setY(color.greenF());
+    result.setZ(color.blueF());
+
+    return result;
+}
+
+}
+
+
+SceneWidget::SceneWidget(QWidget* parent)
      : QOpenGLWidget(parent),
        scene(*this),
        keyStates(maxKeyCode, false)
 {
 }
 
-CubeWidget::~CubeWidget()
+SceneWidget::~SceneWidget()
 {
     makeCurrent();
+    cleanup();
 }
 
-void CubeWidget::selectCamera()
+void SceneWidget::selectCamera()
 {
     pDrivenObject = pCamera;
 }
 
-void CubeWidget::selectPointLights()
+void SceneWidget::setDirInt(float intensity)
 {
-    pDrivenObject = pPointLightObject;
+    pDirLight->intensity = intensity;
 }
 
-void CubeWidget::mousePressEvent(QMouseEvent *e)
+void SceneWidget::setDirColor(const QColor& color)
+{
+    pDirLight->color = getGlColor(color);
+}
+
+void SceneWidget::switchPoint(bool on)
+{
+
+}
+
+void SceneWidget::setPointConst(float constant)
+{
+
+}
+
+void SceneWidget::setPointLin(float linear)
+{
+
+}
+
+void SceneWidget::setPointQuad(float quadric)
+{
+
+}
+
+void SceneWidget::setPointInt(float intensity)
+{
+
+}
+
+void SceneWidget::setPointColor(const QColor& color)
+{
+    pPointLight->color = getGlColor(color);
+}
+
+void SceneWidget::switchSpot(bool on)
+{
+
+}
+
+void SceneWidget::setSpotConst(float constant)
+{
+
+}
+
+void SceneWidget::setSpotLin(float linear)
+{
+
+}
+
+void SceneWidget::setSpotQuad(float quadric)
+{
+
+}
+
+void SceneWidget::setSpotInt(float intensity)
+{
+
+}
+
+void SceneWidget::setSpotColor(const QColor& color)
+{
+    pSpotLight->color = getGlColor(color);
+}
+
+void SceneWidget::setCutOff(float cutOff)
+{
+
+}
+
+void SceneWidget::setOuterCutOff(float outerCutOff)
+{
+
+}
+
+void SceneWidget::setObjectMaterial(int index)
+{
+    baseMaterial = MaterialFactory::make(index);
+    *pMaterial = baseMaterial;
+    pMaterial->ambient *= ambientFac;
+    pMaterial->diffuse *= diffuseFac;
+    pMaterial->specular *= specularFac;
+
+    emit MaterialShininess(pMaterial->shininess);
+}
+
+void SceneWidget::selectPointLight()
+{
+    pDrivenObject = pPointLight;
+}
+
+void SceneWidget::setMaterialAmbient(float val)
+{
+    ambientFac = val;
+    pMaterial->ambient = baseMaterial.ambient * val;
+}
+
+void SceneWidget::setMaterialDiffuse(float val)
+{
+    diffuseFac = val;
+    pMaterial->diffuse = baseMaterial.diffuse * val;
+}
+
+void SceneWidget::setMaterialSpecular(float val)
+{
+    specularFac = val;
+    pMaterial->specular = baseMaterial.specular * val;
+}
+
+void SceneWidget::setMaterialShininess(float val)
+{
+    pMaterial->shininess = val;
+}
+
+void SceneWidget::switchDir(bool on)
+{
+
+}
+
+void SceneWidget::setDirDirection(QVector3D dir)
+{
+    pDirLight->direction = dir;
+}
+
+void SceneWidget::cleanup()
+{
+    scene.clean();
+    pCamera.reset();
+    pDrivenObject.reset();
+    pPointLight.reset();
+
+}
+
+void SceneWidget::mousePressEvent(QMouseEvent *e)
 {
     if (e->buttons() & Qt::LeftButton){
         mouseLastPosition = QVector2D(e->pos());
     }
 }
 
-void CubeWidget::mouseMoveEvent(QMouseEvent* event)
+void SceneWidget::mouseMoveEvent(QMouseEvent* event)
 {
     if (event->buttons() & Qt::LeftButton){
         QVector2D diff = QVector2D(event->pos()) - mouseLastPosition;
@@ -94,17 +241,17 @@ void CubeWidget::mouseMoveEvent(QMouseEvent* event)
     mouseLastPosition = QVector2D(event->pos());
 }
 
-void CubeWidget::keyPressEvent(QKeyEvent* event)
+void SceneWidget::keyPressEvent(QKeyEvent* event)
 {
     keyboard.setKeyState(event->key(), true);
 }
 
-void CubeWidget::keyReleaseEvent(QKeyEvent* event)
+void SceneWidget::keyReleaseEvent(QKeyEvent* event)
 {
     keyboard.setKeyState(event->key(), false);
 }
 
-void CubeWidget::moveProcess(float deltaTime)
+void SceneWidget::moveProcess(float deltaTime)
 {
     float length = cameraSpeed * deltaTime;
     QVector3D direction;
@@ -128,26 +275,28 @@ void CubeWidget::moveProcess(float deltaTime)
         direction += downward;
     }
     pDrivenObject->offsetMove(direction * length);
+    pSpotLight->moveTo(pCamera->cameraPosition());
+    pSpotLight->setDirection(pCamera->front());
 }
 
-void CubeWidget::wheelEvent(QWheelEvent* ev)
+void SceneWidget::wheelEvent(QWheelEvent* ev)
 {
     fov += ev->angleDelta().y() / 60.f;
     fov = std::clamp(fov, 10.f, 150.f);
 }
 
-void CubeWidget::timerEvent(QTimerEvent*)
+void SceneWidget::timerEvent(QTimerEvent*)
 {
     moveProcess(deltaTimeMsec / 1000.f); // deltaTime in sec
     update();
 }
 
-QSize CubeWidget::minimumSizeHint() const
+QSize SceneWidget::minimumSizeHint() const
 {
     return {640, 480};
 }
 
-void CubeWidget::initShaders()
+void SceneWidget::initShaders()
 {
     Q_ASSERT(pObjectShader->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/GuroSceneObject.vert"));
     Q_ASSERT(pObjectShader->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/GuroSceneObject.frag"));
@@ -158,7 +307,17 @@ void CubeWidget::initShaders()
     Q_ASSERT(pLightShader->link());
 }
 
-void CubeWidget::initializeGL()
+void SceneWidget::setBackGroundColor()
+{
+    glClearColor(
+                pDirLight->color.x() * pDirLight->intensity,
+                pDirLight->color.y() * pDirLight->intensity,
+                pDirLight->color.z() * pDirLight->intensity,
+                1.f
+                );
+}
+
+void SceneWidget::initializeGL()
 {
     initializeOpenGLFunctions();
     glClearColor(0.f, 0.f, 0.f, 1.f);
@@ -170,52 +329,49 @@ void CubeWidget::initializeGL()
 
     QMatrix4x4 model;
     auto baseObject = std::make_shared<SceneObject>(
-                          MeshFactory::makeCube({1, 1, 1}, 20),
+                          MeshFactory::makeCube({1, 1, 1}, GridSteps),
                           model,
-                          MaterialFactory::makeGlod()
+                          pMaterial
                           );
 
     auto copy = baseObject->clone();
     copy->offsetMove({4, 0, 0});
 
-
-    //scene.addRenderObject(baseObject);
-    //scene.addRenderObject(copy);
-
-
-    auto grid = std::make_shared<ObjectsGrid>(baseObject, 2.f, 10, 10);
+    auto grid = std::make_shared<ObjectsGrid>(baseObject, 2.f, 4, 4);
     scene.addRenderObject(grid);
-
     model.setToIdentity();
     model.translate(0.f, 0.f, 2.f);
-    auto pointLightSource = std::make_shared<PointLightSource>(MeshFactory::makeCube({0.1, 0.1, 0.1f}),
+    pPointLight = std::make_shared<PointLightSource>(MeshFactory::makeCube({0.1, 0.1, 0.1f}),
                                                 model, QVector3D{1.f, 1.f, 1.f}, 2.f);
 
-    scene.addDirectlyLightSource(std::make_shared<DirecltyLight>(QVector3D(1, 1, 1), 0.1f, QVector3D(0, -1, 1)));
+    scene.addPointLightSource(pPointLight);
 
-    scene.addPointLightSource(pointLightSource);
-
-
-    model.setToIdentity();
-    model.translate(0.f, 2.f, -3.f);
+    pDirLight = std::make_shared<DirecltyLight>(QVector3D(1, 1, 1), DirLightIntensity, DirLightDirection);
+    scene.addDirectlyLightSource(pDirLight);
 
 
-
-    pPointLightObject = scene.pointLightSources[pointLightObjectNum];
-
+    pSpotLight = std::make_shared<SpotLightSource>(pCamera->cameraPosition(), pCamera->front());
+    scene.addSpotLightSource(pSpotLight);
 
     pCamera->setZNear(zNear);
     pCamera->setZFar(zFar);
     timer.start(deltaTimeMsec, this);
+
+    emit MaterialShininess(pMaterial->shininess);
+
+    for (auto& [index, name] : MaterialFactory::names){
+        emit newMaterial(name);
+    }
 }
 
-void CubeWidget::resizeGL(int w, int h)
+void SceneWidget::resizeGL(int w, int h)
 {
     pCamera->setAspectRatio(float(w) / float(h ? h : 1));
 }
 
-void CubeWidget::paintGL()
+void SceneWidget::paintGL()
 {
+    setBackGroundColor();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     pCamera->setFOV(fov);
 

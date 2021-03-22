@@ -6,7 +6,7 @@ TARGET = Problem3_4
 
 SOURCES += \
         cameraview.cpp \
-        cubewidget.cpp \
+        dialog.cpp \
         direcltylight.cpp \
         keyboard.cpp \
         main.cpp \
@@ -16,12 +16,15 @@ SOURCES += \
         objectsgrid.cpp \
         pointlightsource.cpp \
         scene.cpp \
-        sceneobject.cpp
+        sceneobject.cpp \
+        scenewidget.cpp \
+        spotlightsource.cpp
 
 RESOURCES += \
     shaders.qrc
 
 FORMS += \
+    dialog.ui \
     mainwindow.ui
 
 DISTFILES += \
@@ -30,7 +33,7 @@ DISTFILES += \
 
 HEADERS += \
     cameraview.hpp \
-    cubewidget.hpp \
+    dialog.hpp \
     direcltylight.hpp \
     keyboard.hpp \
     lightsource.hpp \
@@ -46,4 +49,6 @@ HEADERS += \
     renderobject.hpp \
     scene.hpp \
     sceneobject.hpp \
+    scenewidget.hpp \
+    spotlightsource.hpp \
     vertex.hpp

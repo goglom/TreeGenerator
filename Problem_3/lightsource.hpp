@@ -4,16 +4,15 @@
 
 class LightSource
 {
-protected:
-    QVector3D color_{1.f, 1.f, 1.f};
-    float intensity_ = 1.f;
-
 public:
+    QVector3D color{1.f, 1.f, 1.f};
+    float intensity = 1.f;
 
-    LightSource(QVector3D const& color,
-                float intensity
+
+    LightSource(QVector3D const& _color,
+                float _intensity
                 )
-        : color_(color), intensity_(intensity)
+        : color(_color), intensity(_intensity)
     {
     }
 

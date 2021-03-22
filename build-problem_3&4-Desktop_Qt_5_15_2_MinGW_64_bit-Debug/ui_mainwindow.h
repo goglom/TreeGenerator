@@ -11,16 +11,16 @@
 
 #include <QtCore/QVariant>
 #include <QtWidgets/QApplication>
-#include <QtWidgets/QFormLayout>
 #include <QtWidgets/QHBoxLayout>
+#include <QtWidgets/QLabel>
 #include <QtWidgets/QMainWindow>
-#include <QtWidgets/QMenuBar>
+#include <QtWidgets/QPushButton>
 #include <QtWidgets/QRadioButton>
-#include <QtWidgets/QSpinBox>
-#include <QtWidgets/QStatusBar>
+#include <QtWidgets/QSlider>
+#include <QtWidgets/QSpacerItem>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
-#include "cubewidget.hpp"
+#include "scenewidget.hpp"
 
 QT_BEGIN_NAMESPACE
 
@@ -28,93 +28,104 @@ class Ui_MainWindow
 {
 public:
     QWidget *centralwidget;
-    QHBoxLayout *horizontalLayout;
-    CubeWidget *cubeWidget;
-    QFormLayout *formLayout;
-    QRadioButton *radioButton_2;
-    QSpinBox *spinBox;
-    QRadioButton *radioButton_3;
-    QSpinBox *spinBox_2;
     QVBoxLayout *verticalLayout;
-    QRadioButton *radioButton;
-    QMenuBar *menubar;
-    QStatusBar *statusbar;
+    QHBoxLayout *horizontalLayout_4;
+    QSpacerItem *horizontalSpacer;
+    QLabel *label_3;
+    QHBoxLayout *horizontalLayout_3;
+    QRadioButton *CameraButton;
+    QRadioButton *radioButton_2;
+    SceneWidget *Scene;
+    QHBoxLayout *horizontalLayout;
+    QLabel *label_2;
+    QSlider *horizontalSlider;
+    QLabel *label;
+    QPushButton *SceneOptionsButton;
 
     void setupUi(QMainWindow *MainWindow)
     {
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName(QString::fromUtf8("MainWindow"));
-        MainWindow->resize(855, 681);
+        MainWindow->resize(911, 641);
         MainWindow->setMinimumSize(QSize(640, 640));
         centralwidget = new QWidget(MainWindow);
         centralwidget->setObjectName(QString::fromUtf8("centralwidget"));
         centralwidget->setStyleSheet(QString::fromUtf8("QPushButton{}"));
-        horizontalLayout = new QHBoxLayout(centralwidget);
-        horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
-        cubeWidget = new CubeWidget(centralwidget);
-        cubeWidget->setObjectName(QString::fromUtf8("cubeWidget"));
-        QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-        sizePolicy.setHorizontalStretch(1);
-        sizePolicy.setVerticalStretch(1);
-        sizePolicy.setHeightForWidth(cubeWidget->sizePolicy().hasHeightForWidth());
-        cubeWidget->setSizePolicy(sizePolicy);
-        cubeWidget->setMinimumSize(QSize(640, 480));
-        cubeWidget->setFocusPolicy(Qt::StrongFocus);
+        verticalLayout = new QVBoxLayout(centralwidget);
+        verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
+        horizontalLayout_4 = new QHBoxLayout();
+        horizontalLayout_4->setObjectName(QString::fromUtf8("horizontalLayout_4"));
+        horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
-        horizontalLayout->addWidget(cubeWidget);
+        horizontalLayout_4->addItem(horizontalSpacer);
 
-        formLayout = new QFormLayout();
-        formLayout->setObjectName(QString::fromUtf8("formLayout"));
+        label_3 = new QLabel(centralwidget);
+        label_3->setObjectName(QString::fromUtf8("label_3"));
+
+        horizontalLayout_4->addWidget(label_3);
+
+        horizontalLayout_3 = new QHBoxLayout();
+        horizontalLayout_3->setObjectName(QString::fromUtf8("horizontalLayout_3"));
+        CameraButton = new QRadioButton(centralwidget);
+        CameraButton->setObjectName(QString::fromUtf8("CameraButton"));
+        CameraButton->setChecked(true);
+
+        horizontalLayout_3->addWidget(CameraButton);
+
         radioButton_2 = new QRadioButton(centralwidget);
         radioButton_2->setObjectName(QString::fromUtf8("radioButton_2"));
-        radioButton_2->setFocusPolicy(Qt::ClickFocus);
-        radioButton_2->setChecked(false);
 
-        formLayout->setWidget(1, QFormLayout::LabelRole, radioButton_2);
-
-        spinBox = new QSpinBox(centralwidget);
-        spinBox->setObjectName(QString::fromUtf8("spinBox"));
-
-        formLayout->setWidget(1, QFormLayout::FieldRole, spinBox);
-
-        radioButton_3 = new QRadioButton(centralwidget);
-        radioButton_3->setObjectName(QString::fromUtf8("radioButton_3"));
-        radioButton_3->setFocusPolicy(Qt::ClickFocus);
-
-        formLayout->setWidget(2, QFormLayout::LabelRole, radioButton_3);
-
-        spinBox_2 = new QSpinBox(centralwidget);
-        spinBox_2->setObjectName(QString::fromUtf8("spinBox_2"));
-
-        formLayout->setWidget(2, QFormLayout::FieldRole, spinBox_2);
-
-        verticalLayout = new QVBoxLayout();
-        verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
-
-        formLayout->setLayout(3, QFormLayout::LabelRole, verticalLayout);
-
-        radioButton = new QRadioButton(centralwidget);
-        radioButton->setObjectName(QString::fromUtf8("radioButton"));
-        radioButton->setFocusPolicy(Qt::WheelFocus);
-        radioButton->setChecked(true);
-
-        formLayout->setWidget(0, QFormLayout::LabelRole, radioButton);
+        horizontalLayout_3->addWidget(radioButton_2);
 
 
-        horizontalLayout->addLayout(formLayout);
+        horizontalLayout_4->addLayout(horizontalLayout_3);
+
+
+        verticalLayout->addLayout(horizontalLayout_4);
+
+        Scene = new SceneWidget(centralwidget);
+        Scene->setObjectName(QString::fromUtf8("Scene"));
+        QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        sizePolicy.setHorizontalStretch(0);
+        sizePolicy.setVerticalStretch(0);
+        sizePolicy.setHeightForWidth(Scene->sizePolicy().hasHeightForWidth());
+        Scene->setSizePolicy(sizePolicy);
+        Scene->setMinimumSize(QSize(640, 480));
+        Scene->setFocusPolicy(Qt::StrongFocus);
+
+        verticalLayout->addWidget(Scene);
+
+        horizontalLayout = new QHBoxLayout();
+        horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
+        label_2 = new QLabel(centralwidget);
+        label_2->setObjectName(QString::fromUtf8("label_2"));
+
+        horizontalLayout->addWidget(label_2);
+
+        horizontalSlider = new QSlider(centralwidget);
+        horizontalSlider->setObjectName(QString::fromUtf8("horizontalSlider"));
+        horizontalSlider->setOrientation(Qt::Horizontal);
+
+        horizontalLayout->addWidget(horizontalSlider);
+
+        label = new QLabel(centralwidget);
+        label->setObjectName(QString::fromUtf8("label"));
+
+        horizontalLayout->addWidget(label);
+
+        SceneOptionsButton = new QPushButton(centralwidget);
+        SceneOptionsButton->setObjectName(QString::fromUtf8("SceneOptionsButton"));
+
+        horizontalLayout->addWidget(SceneOptionsButton);
+
+
+        verticalLayout->addLayout(horizontalLayout);
 
         MainWindow->setCentralWidget(centralwidget);
-        menubar = new QMenuBar(MainWindow);
-        menubar->setObjectName(QString::fromUtf8("menubar"));
-        menubar->setGeometry(QRect(0, 0, 855, 25));
-        MainWindow->setMenuBar(menubar);
-        statusbar = new QStatusBar(MainWindow);
-        statusbar->setObjectName(QString::fromUtf8("statusbar"));
-        MainWindow->setStatusBar(statusbar);
 
         retranslateUi(MainWindow);
-        QObject::connect(radioButton_2, SIGNAL(clicked()), cubeWidget, SLOT(selectPointLights()));
-        QObject::connect(radioButton, SIGNAL(clicked()), cubeWidget, SLOT(selectCamera()));
+        QObject::connect(CameraButton, SIGNAL(clicked()), Scene, SLOT(selectCamera()));
+        QObject::connect(radioButton_2, SIGNAL(clicked()), Scene, SLOT(selectPointLight()));
 
         QMetaObject::connectSlotsByName(MainWindow);
     } // setupUi
@@ -122,9 +133,12 @@ public:
     void retranslateUi(QMainWindow *MainWindow)
     {
         MainWindow->setWindowTitle(QCoreApplication::translate("MainWindow", "MainWindow", nullptr));
-        radioButton_2->setText(QCoreApplication::translate("MainWindow", "Point lights", nullptr));
-        radioButton_3->setText(QCoreApplication::translate("MainWindow", "Spot lights", nullptr));
-        radioButton->setText(QCoreApplication::translate("MainWindow", "Camera", nullptr));
+        label_3->setText(QCoreApplication::translate("MainWindow", "Driven object:", nullptr));
+        CameraButton->setText(QCoreApplication::translate("MainWindow", "Camera", nullptr));
+        radioButton_2->setText(QCoreApplication::translate("MainWindow", "Point Light", nullptr));
+        label_2->setText(QCoreApplication::translate("MainWindow", "Object number", nullptr));
+        label->setText(QCoreApplication::translate("MainWindow", "TextLabel", nullptr));
+        SceneOptionsButton->setText(QCoreApplication::translate("MainWindow", "Scene options", nullptr));
     } // retranslateUi
 
 };

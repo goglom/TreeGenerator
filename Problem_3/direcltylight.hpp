@@ -2,11 +2,11 @@
 
 #include "lightsource.hpp"
 
-class DirecltyLight : protected LightSource
+class DirecltyLight : public LightSource
 {
-    QVector3D direction_;
-
 public:
+    QVector3D direction;
+
     DirecltyLight(QVector3D const& color,
                   float intensity,
                   QVector3D const& direction

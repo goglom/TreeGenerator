@@ -1,12 +1,43 @@
 #include "mainwindow.hpp"
 #include "ui_mainwindow.h"
 
+#include "dialog.hpp"
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow)
+    ui(new Ui::MainWindow),
+    dialog(new Dialog(this))
 {
     ui->setupUi(this);
 
+    QObject::connect(dialog, &Dialog::ObjectMaterialChanged,
+                     ui->Scene, &SceneWidget::setObjectMaterial);
+    QObject::connect(ui->Scene, &SceneWidget::MaterialShininess,
+                     dialog, &Dialog::setShininessVal);
+
+    QObject::connect(ui->Scene, &SceneWidget::newMaterial,
+                     dialog, &Dialog::addMaterial);
+
+    QObject::connect(dialog, &Dialog::AmbientChanged,
+                     ui->Scene, &SceneWidget::setMaterialAmbient);
+    QObject::connect(dialog, &Dialog::DiffuseChanged,
+                     ui->Scene, &SceneWidget::setMaterialDiffuse);
+    QObject::connect(dialog, &Dialog::SpecularChanged,
+                     ui->Scene, &SceneWidget::setMaterialSpecular);
+    QObject::connect(dialog, &Dialog::ShininessChanged,
+                     ui->Scene, &SceneWidget::setMaterialShininess);
+    QObject::connect(dialog, &Dialog::DirLightIntensityChanged,
+                     ui->Scene, &SceneWidget::setDirInt);
+
+    QObject::connect(dialog, &Dialog::DirLightColorChanged,
+                     ui->Scene, &SceneWidget::setDirColor);
+    QObject::connect(dialog, &Dialog::PointLightColorChanged,
+                     ui->Scene, &SceneWidget::setPointColor);
+    QObject::connect(dialog, &Dialog::SpotLightColorChanged,
+                     ui->Scene, &SceneWidget::setSpotColor);
+
+    QObject::connect(dialog, &Dialog::DirLightDirectionChanged,
+                     ui->Scene, &SceneWidget::setDirDirection);
 }
 
 MainWindow::~MainWindow()
@@ -14,3 +45,9 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+
+
+void MainWindow::on_SceneOptionsButton_clicked()
+{
+    dialog->show();
+}
