@@ -21,6 +21,8 @@ CameraView::CameraView(
       front_(front),
       worldUp_(up)
 {
+    yaw_ = std::atan2(front_.z(), front_.x());
+    pitch_ = -std::asin(front_.y());
     updateVectors();
 }
 
