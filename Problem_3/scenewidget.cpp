@@ -123,22 +123,22 @@ void SceneWidget::setPointColor(const QColor& color)
 
 void SceneWidget::setSpotConst(float constant)
 {
-
+    pSpotLight->constFactor = constant;
 }
 
 void SceneWidget::setSpotLin(float linear)
 {
-
+    pSpotLight->linFactor = linear;
 }
 
 void SceneWidget::setSpotQuad(float quadric)
 {
-
+    pSpotLight->quadFactor = quadric;
 }
 
 void SceneWidget::setSpotInt(float intensity)
 {
-
+    pSpotLight->intensity = intensity;
 }
 
 void SceneWidget::setSpotColor(const QColor& color)
@@ -148,12 +148,13 @@ void SceneWidget::setSpotColor(const QColor& color)
 
 void SceneWidget::setCutOff(float cutOff)
 {
-
+    pSpotLight->cutOff = qDegreesToRadians(cutOff);
 }
 
 void SceneWidget::setOuterCutOff(float outerCutOff)
 {
 
+    pSpotLight->outerCutOff = qDegreesToRadians(outerCutOff);
 }
 
 void SceneWidget::setObjectMaterial(int index)
@@ -330,16 +331,14 @@ void SceneWidget::initializeGL()
                           pMaterial
                           );
 
-    auto copy = baseObject->clone();
-    copy->offsetMove({4, 0, 0});
-
     pObjectsGrid = std::make_shared<ObjectsGrid>(baseObject, GridStepLength, 4, 4);
     scene.addRenderObject(pObjectsGrid);
     model.setToIdentity();
-    model.translate(0.f, 0.f, 2.f);
+    model.translate(2.f, 2.f, 2.f);
+
     pPointLight = std::make_shared<PointLightSource>(
                       MeshFactory::makeCube({0.1, 0.1, 0.1f}),
-                      model, QVector3D{1.f, 1.f, 1.f}, 2.f
+                      model, QVector3D{1.f, 1.f, 1.f}, 1.f
                       );
 
     scene.addPointLightSource(pPointLight);

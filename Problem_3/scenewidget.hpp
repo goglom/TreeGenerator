@@ -105,7 +105,7 @@ private:
     _ISC_ QVector3D leftward = -rightward;
     _ISC_ QVector3D downward = -upward;
     _ISC_ size_t GridSteps = 50;
-    _ISC_ float GridStepLength = 1.f;
+    _ISC_ float GridStepLength = 1.5f;
     _ISC_ float DirLightIntensity = 0.1;
     _ISC_ QVector3D DirLightDirection{0, -1, 0};
 
@@ -115,7 +115,7 @@ private:
                      Qt::Key_Slash, Qt::Key_Greater};
 
 
-    Material baseMaterial = MaterialFactory::makeGlod();
+    Material baseMaterial = MaterialFactory::Gold;
     sPtr<Material> pMaterial = std::make_shared<Material>(baseMaterial);
     float ambientFac = 1.f;
     float diffuseFac = 1.f;
@@ -137,7 +137,10 @@ private:
 
     Scene scene;
     sPtr<CameraView> pCamera
-        = std::make_shared<CameraView>(QVector3D{0.f, 0.f, 5.f});
+        = std::make_shared<CameraView>(
+              QVector3D{0.f, 1.2f, 0.f},
+              QVector3D{1.f, 0.f, 1.f}
+              );
 
     sPtr<Object> pDrivenObject
         = std::static_pointer_cast<Object>(pCamera);
