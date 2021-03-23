@@ -155,3 +155,47 @@ void Dialog::on_PointLightIntensitySlider_valueChanged(int value)
 
     emit PointLightIntensityChanged(res);
 }
+
+void Dialog::on_SpotLightIntensitySlider_valueChanged(int value)
+{
+    float range = ui->SpotLightIntensitySlider->maximum() - ui->SpotLightIntensitySlider->minimum();
+    float res = value / range;
+    ui->SpotLightIntensityVal->setText(QString::number(res, 'f', 2));
+
+    emit SpotLightIntensityChanged(res);
+}
+
+void Dialog::on_SpotLightConstSpinBox_valueChanged(double arg1)
+{
+    emit SpotLightConstChanged(arg1);
+}
+
+void Dialog::on_SpotLightLinSpinBox_valueChanged(double arg1)
+{
+    emit SpotLightLinChanged(arg1);
+}
+
+void Dialog::on_SpotLightQuadSpinBox_valueChanged(double arg1)
+{
+    emit SpotLightQuadChanged(arg1);
+}
+
+void Dialog::on_CutOffSlider_valueChanged(int value)
+{
+    ui->CutOffVal->setNum(value);
+
+    emit CutOffChanged(value);
+}
+
+void Dialog::on_OuterCutOffSlider_valueChanged(int value)
+{
+    ui->OuterCutOffVal->setNum(value);
+
+    emit OuterCutOffChanged(value);
+}
+
+void Dialog::on_SpotLightColorButton_clicked()
+{
+    lightSource = LightSources::Spot;
+    colorDialog->show();
+}

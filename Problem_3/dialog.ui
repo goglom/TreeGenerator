@@ -610,13 +610,13 @@
        <item row="1" column="1">
         <widget class="QSlider" name="OuterCutOffSlider">
          <property name="minimum">
-          <number>1</number>
+          <number>0</number>
          </property>
          <property name="maximum">
           <number>90</number>
          </property>
          <property name="value">
-          <number>15</number>
+          <number>3</number>
          </property>
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
@@ -626,14 +626,14 @@
        <item row="1" column="0">
         <widget class="QLabel" name="label_12">
          <property name="text">
-          <string>Outer cut off</string>
+          <string>Smooth angle</string>
          </property>
         </widget>
        </item>
        <item row="1" column="2">
         <widget class="QLabel" name="OuterCutOffVal">
          <property name="text">
-          <string>15</string>
+          <string>3</string>
          </property>
         </widget>
        </item>
@@ -663,8 +663,8 @@
      <y>590</y>
     </hint>
     <hint type="destinationlabel">
-     <x>315</x>
-     <y>595</y>
+     <x>408</x>
+     <y>607</y>
     </hint>
    </hints>
   </connection>
@@ -679,8 +679,8 @@
      <y>617</y>
     </hint>
     <hint type="destinationlabel">
-     <x>309</x>
-     <y>619</y>
+     <x>408</x>
+     <y>632</y>
     </hint>
    </hints>
   </connection>

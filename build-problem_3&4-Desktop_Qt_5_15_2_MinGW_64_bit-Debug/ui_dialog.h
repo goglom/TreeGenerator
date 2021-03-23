@@ -507,9 +507,9 @@ public:
 
         OuterCutOffSlider = new QSlider(Dialog);
         OuterCutOffSlider->setObjectName(QString::fromUtf8("OuterCutOffSlider"));
-        OuterCutOffSlider->setMinimum(1);
+        OuterCutOffSlider->setMinimum(0);
         OuterCutOffSlider->setMaximum(90);
-        OuterCutOffSlider->setValue(15);
+        OuterCutOffSlider->setValue(3);
         OuterCutOffSlider->setOrientation(Qt::Horizontal);
 
         gridLayout_5->addWidget(OuterCutOffSlider, 1, 1, 1, 1);
@@ -575,8 +575,8 @@ public:
         label_10->setText(QCoreApplication::translate("Dialog", "Linear", nullptr));
         CutOffVal->setText(QCoreApplication::translate("Dialog", "12", nullptr));
         label_4->setText(QCoreApplication::translate("Dialog", "Cut off", nullptr));
-        label_12->setText(QCoreApplication::translate("Dialog", "Outer cut off", nullptr));
-        OuterCutOffVal->setText(QCoreApplication::translate("Dialog", "15", nullptr));
+        label_12->setText(QCoreApplication::translate("Dialog", "Smooth angle", nullptr));
+        OuterCutOffVal->setText(QCoreApplication::translate("Dialog", "3", nullptr));
         SpotLightColorButton->setText(QCoreApplication::translate("Dialog", "Select color", nullptr));
     } // retranslateUi
 

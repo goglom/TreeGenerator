@@ -135,10 +135,10 @@ public:
 
         doubleSpinBox = new QDoubleSpinBox(centralwidget);
         doubleSpinBox->setObjectName(QString::fromUtf8("doubleSpinBox"));
-        doubleSpinBox->setMinimum(1.000000000000000);
+        doubleSpinBox->setMinimum(0.100000000000000);
         doubleSpinBox->setMaximum(100.000000000000000);
-        doubleSpinBox->setSingleStep(1.000000000000000);
-        doubleSpinBox->setValue(1.000000000000000);
+        doubleSpinBox->setSingleStep(0.100000000000000);
+        doubleSpinBox->setValue(1.500000000000000);
 
         horizontalLayout->addWidget(doubleSpinBox);
 

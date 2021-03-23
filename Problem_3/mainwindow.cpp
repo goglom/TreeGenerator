@@ -14,10 +14,8 @@ MainWindow::MainWindow(QWidget *parent) :
                      ui->Scene, &SceneWidget::setObjectMaterial);
     QObject::connect(ui->Scene, &SceneWidget::MaterialShininess,
                      dialog, &Dialog::setShininessVal);
-
     QObject::connect(ui->Scene, &SceneWidget::newMaterial,
                      dialog, &Dialog::addMaterial);
-
     QObject::connect(dialog, &Dialog::AmbientChanged,
                      ui->Scene, &SceneWidget::setMaterialAmbient);
     QObject::connect(dialog, &Dialog::DiffuseChanged,
@@ -28,17 +26,14 @@ MainWindow::MainWindow(QWidget *parent) :
                      ui->Scene, &SceneWidget::setMaterialShininess);
     QObject::connect(dialog, &Dialog::DirLightIntensityChanged,
                      ui->Scene, &SceneWidget::setDirInt);
-
     QObject::connect(dialog, &Dialog::DirLightColorChanged,
                      ui->Scene, &SceneWidget::setDirColor);
     QObject::connect(dialog, &Dialog::PointLightColorChanged,
                      ui->Scene, &SceneWidget::setPointColor);
     QObject::connect(dialog, &Dialog::SpotLightColorChanged,
                      ui->Scene, &SceneWidget::setSpotColor);
-
     QObject::connect(dialog, &Dialog::DirLightDirectionChanged,
                      ui->Scene, &SceneWidget::setDirDirection);
-
     QObject::connect(dialog, &Dialog::PointLightIntensityChanged,
                      ui->Scene, &SceneWidget::setPointInt);
     QObject::connect(dialog, &Dialog::PointLightConstChanged,
@@ -47,6 +42,18 @@ MainWindow::MainWindow(QWidget *parent) :
                      ui->Scene, &SceneWidget::setPointLin);
     QObject::connect(dialog, &Dialog::PointLightQuadChanged,
                      ui->Scene, &SceneWidget::setPointQuad);
+    QObject::connect(dialog, &Dialog::SpotLightIntensityChanged,
+                     ui->Scene, &SceneWidget::setSpotInt);
+    QObject::connect(dialog, &Dialog::SpotLightConstChanged,
+                     ui->Scene, &SceneWidget::setSpotConst);
+    QObject::connect(dialog, &Dialog::SpotLightLinChanged,
+                     ui->Scene, &SceneWidget::setSpotLin);
+    QObject::connect(dialog, &Dialog::SpotLightQuadChanged,
+                     ui->Scene, &SceneWidget::setSpotQuad);
+    QObject::connect(dialog, &Dialog::CutOffChanged,
+                     ui->Scene, &SceneWidget::setCutOff);
+    QObject::connect(dialog, &Dialog::OuterCutOffChanged,
+                     ui->Scene, &SceneWidget::setOuterCutOff);
 }
 
 MainWindow::~MainWindow()
