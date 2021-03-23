@@ -9,7 +9,7 @@ struct Material
     QVector3D specular;
     float shininess;
 
-    Material(QVector3D const& _ambient,
+    constexpr Material(QVector3D const& _ambient,
              QVector3D const& _diffuse,
              QVector3D const& _specular,
              float _shininess
