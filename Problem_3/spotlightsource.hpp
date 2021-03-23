@@ -21,8 +21,8 @@ public:
                     QVector3D const& direction,
                     QVector3D const& color = {1.f, 1.f, 1.f},
                     float intensity = 1.f,
-                    float cutOff = qDegreesToRadians(12.5f),
-                    float outerCutOff = qDegreesToRadians(15.0f),
+                    float cutOff = qDegreesToRadians(12.f),
+                    float outerCutOff = qDegreesToRadians(3.f),
                     float constFact  = 1.f,
                     float linFact    = 0.09f,
                     float quadFact   = 0.032f

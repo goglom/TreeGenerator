@@ -31,7 +31,7 @@ void SpotLightSource::uploadToShader(std::shared_ptr<QOpenGLShaderProgram> pShad
     pShader->setUniformValue(("spotLights[" + std::to_string(index) + "].linFactor").c_str(), linFactor);
     pShader->setUniformValue(("spotLights[" + std::to_string(index) + "].quadFactor").c_str(), quadFactor);
     pShader->setUniformValue(("spotLights[" + std::to_string(index) + "].cutOff").c_str(), cutOff);
-    pShader->setUniformValue(("spotLights[" + std::to_string(index) + "].outerCutOff").c_str(), outerCutOff);
+    pShader->setUniformValue(("spotLights[" + std::to_string(index) + "].outerCutOff").c_str(), cutOff + outerCutOff + 0.0001f);
 }
 
 void SpotLightSource::offsetMove(const QVector3D& offset)
