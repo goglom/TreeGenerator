@@ -32,6 +32,8 @@ public:
     QWidget *centralwidget;
     QVBoxLayout *verticalLayout;
     QHBoxLayout *horizontalLayout_4;
+    QLabel *label_5;
+    QLabel *label_6;
     QSpacerItem *horizontalSpacer;
     QLabel *label_3;
     QHBoxLayout *horizontalLayout_3;
@@ -60,6 +62,20 @@ public:
         verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
         horizontalLayout_4 = new QHBoxLayout();
         horizontalLayout_4->setObjectName(QString::fromUtf8("horizontalLayout_4"));
+        label_5 = new QLabel(centralwidget);
+        label_5->setObjectName(QString::fromUtf8("label_5"));
+
+        horizontalLayout_4->addWidget(label_5);
+
+        label_6 = new QLabel(centralwidget);
+        label_6->setObjectName(QString::fromUtf8("label_6"));
+        label_6->setStyleSheet(QString::fromUtf8("QLabel{\n"
+"	color : rgb(85, 255, 0);\n"
+"	font-weight : bold;\n"
+"}"));
+
+        horizontalLayout_4->addWidget(label_6);
+
         horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
         horizontalLayout_4->addItem(horizontalSpacer);
@@ -157,6 +173,7 @@ public:
         QObject::connect(radioButton_2, SIGNAL(clicked()), Scene, SLOT(selectPointLight()));
         QObject::connect(horizontalSlider, SIGNAL(valueChanged(int)), label, SLOT(setNum(int)));
         QObject::connect(horizontalSlider, SIGNAL(valueChanged(int)), Scene, SLOT(setGridSteps(int)));
+        QObject::connect(Scene, SIGNAL(fpsChanged(int)), label_6, SLOT(setNum(int)));
 
         QMetaObject::connectSlotsByName(MainWindow);
     } // setupUi
@@ -164,6 +181,8 @@ public:
     void retranslateUi(QMainWindow *MainWindow)
     {
         MainWindow->setWindowTitle(QCoreApplication::translate("MainWindow", "MainWindow", nullptr));
+        label_5->setText(QCoreApplication::translate("MainWindow", "FPS: ", nullptr));
+        label_6->setText(QCoreApplication::translate("MainWindow", "0", nullptr));
         label_3->setText(QCoreApplication::translate("MainWindow", "Driven object:", nullptr));
         CameraButton->setText(QCoreApplication::translate("MainWindow", "Camera", nullptr));
         radioButton_2->setText(QCoreApplication::translate("MainWindow", "Point Light", nullptr));

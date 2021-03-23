@@ -12,6 +12,7 @@
 #include "keyboard.hpp"
 #include "objectsgrid.hpp"
 
+#include <QElapsedTimer>
 #include <vector>
 #include <unordered_map>
 #include <QOpenGLWidget>
@@ -38,6 +39,7 @@ public:
 signals:
     void MaterialShininess(float);
     void newMaterial(QString const&);
+    void fpsChanged(int);
 
 public slots:
     void selectCamera();
@@ -87,7 +89,7 @@ private:
     void resizeGL(int w, int h) override;
     void paintGL() override;
 
-    void moveProcess(float deltaTime);
+    void moveProcess();
     void initShaders();
     void setBackGroundColor();
 
@@ -150,6 +152,11 @@ private:
 
     QVector2D mouseLastPosition;
     std::vector<bool> keyStates;
+
+    int framesCount = 0;
+    float deltaTime = 0.f;
+    QElapsedTimer fpsTimer;
+    QElapsedTimer deltaTimer;
 
     QBasicTimer timer;
 };

@@ -27,6 +27,26 @@
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_4">
       <item>
+       <widget class="QLabel" name="label_5">
+        <property name="text">
+         <string>FPS: </string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_6">
+        <property name="styleSheet">
+         <string notr="true">QLabel{
+	color : rgb(85, 255, 0);
+	font-weight : bold;
+}</string>
+        </property>
+        <property name="text">
+         <string>0</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <spacer name="horizontalSpacer">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -169,6 +189,7 @@
    <header>scenewidget.hpp</header>
    <container>1</container>
    <slots>
+    <signal>fpsChanged(int)</signal>
     <slot>callOptionsDialog()</slot>
     <slot>selectCamera()</slot>
     <slot>selectPointLight()</slot>
@@ -239,6 +260,22 @@
     <hint type="destinationlabel">
      <x>449</x>
      <y>519</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>Scene</sender>
+   <signal>fpsChanged(int)</signal>
+   <receiver>label_6</receiver>
+   <slot>setNum(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>111</x>
+     <y>127</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>53</x>
+     <y>24</y>
     </hint>
    </hints>
   </connection>

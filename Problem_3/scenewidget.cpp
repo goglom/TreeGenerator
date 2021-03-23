@@ -50,6 +50,7 @@
 
 #include "scenewidget.hpp"
 
+#include <QElapsedTimer>
 #include <QMouseEvent>
 #include <iostream>
 #include <cmath>
@@ -248,7 +249,7 @@ void SceneWidget::keyReleaseEvent(QKeyEvent* event)
     keyboard.setKeyState(event->key(), false);
 }
 
-void SceneWidget::moveProcess(float deltaTime)
+void SceneWidget::moveProcess()
 {
     float length = cameraSpeed * deltaTime;
     QVector3D direction;
@@ -284,7 +285,7 @@ void SceneWidget::wheelEvent(QWheelEvent* ev)
 
 void SceneWidget::timerEvent(QTimerEvent*)
 {
-    moveProcess(deltaTimeMsec / 1000.f); // deltaTime in sec
+    moveProcess(); // deltaTime in sec
     update();
 }
 
@@ -295,13 +296,19 @@ QSize SceneWidget::minimumSizeHint() const
 
 void SceneWidget::initShaders()
 {
-    Q_ASSERT(pObjectShader->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/GuroSceneObject.vert"));
-    Q_ASSERT(pObjectShader->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/GuroSceneObject.frag"));
-    Q_ASSERT(pObjectShader->link());
+    bool res = pObjectShader->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/GuroSceneObject.vert");
+    Q_ASSERT(res);
+    res = pObjectShader->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/GuroSceneObject.frag");
+    Q_ASSERT(res);
+    res = pObjectShader->link();
+    Q_ASSERT(res);
 
-    Q_ASSERT(pLightShader->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/LightSource.vert"));
-    Q_ASSERT(pLightShader->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/GuroSceneObject.frag"));
-    Q_ASSERT(pLightShader->link());
+    res = pLightShader->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/LightSource.vert");
+    Q_ASSERT(res);
+    res = pLightShader->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/GuroSceneObject.frag");
+    Q_ASSERT(res);
+    res = pLightShader->link();
+    Q_ASSERT(res);
 }
 
 void SceneWidget::setBackGroundColor()
@@ -357,6 +364,8 @@ void SceneWidget::initializeGL()
     for (auto& [index, name] : MaterialFactory::names){
         emit newMaterial(name);
     }
+    fpsTimer.start();
+    deltaTimer.start();
 }
 
 void SceneWidget::resizeGL(int w, int h)
@@ -366,6 +375,7 @@ void SceneWidget::resizeGL(int w, int h)
 
 void SceneWidget::paintGL()
 {
+    // ---------------- Render block ------------------------------------------
     setBackGroundColor();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     pCamera->setFOV(fov);
@@ -379,5 +389,18 @@ void SceneWidget::paintGL()
     pLightShader->setUniformValue("cameraPos", pCamera->cameraPosition());
 
     scene.renderAll();
+
+    //-------------------------------------------------------------------------
+
+    deltaTime = deltaTimer.elapsed() / 1000.f;
+    deltaTimer.restart();
+
+    framesCount++;
+    if (fpsTimer.elapsed() > 1000){
+        emit fpsChanged(framesCount + 1);
+        framesCount = 0;
+        fpsTimer.restart();
+    }
+
 }
 
