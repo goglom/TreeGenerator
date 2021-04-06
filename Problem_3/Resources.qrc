@@ -1,0 +1,15 @@
+<RCC>
+    <qresource prefix="/Shaders">
+        <file>GuroSceneObject.vert</file>
+        <file>GuroSceneObject.frag</file>
+        <file>LightSource.vert</file>
+        <file>FongSceneObject.frag</file>
+        <file>FongSceneObject.vert</file>
+        <file>LightSource.frag</file>
+    </qresource>
+    <qresource prefix="/Textures">
+        <file>Earth_Albedo.jpg</file>
+        <file>Earth_NormalMap.jpg</file>
+        <file>Sun_texture.jpg</file>
+    </qresource>
+</RCC>

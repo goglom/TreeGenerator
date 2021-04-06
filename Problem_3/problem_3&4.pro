@@ -11,17 +11,19 @@ SOURCES += \
         keyboard.cpp \
         main.cpp \
         mainwindow.cpp \
+        materialobject.cpp \
         meshfactory.cpp \
         meshobject.cpp \
         objectsgrid.cpp \
         pointlightsource.cpp \
         scene.cpp \
-        sceneobject.cpp \
         scenewidget.cpp \
-        spotlightsource.cpp
+        spotlightsource.cpp \
+        texture.cpp \
+        texturedobject.cpp
 
 RESOURCES += \
-    shaders.qrc
+    Resources.qrc
 
 FORMS += \
     dialog.ui \
@@ -35,11 +37,13 @@ HEADERS += \
     cameraview.hpp \
     dialog.hpp \
     direcltylight.hpp \
+    glcolor.hpp \
     keyboard.hpp \
     lightsource.hpp \
     mainwindow.hpp \
     material.hpp \
     materialfactory.hpp \
+    materialobject.hpp \
     mesh.hpp \
     meshfactory.hpp \
     meshobject.hpp \
@@ -47,8 +51,10 @@ HEADERS += \
     objectsgrid.hpp \
     pointlightsource.hpp \
     renderobject.hpp \
+    renderobjectdecorator.hpp \
     scene.hpp \
-    sceneobject.hpp \
     scenewidget.hpp \
     spotlightsource.hpp \
+    texture.hpp \
+    texturedobject.hpp \
     vertex.hpp
