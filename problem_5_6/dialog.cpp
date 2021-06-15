@@ -1,6 +1,8 @@
 #include "dialog.hpp"
 #include "ui_dialog.h"
 
+#include <QtMath>
+
 Dialog::Dialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::Dialog),
@@ -11,9 +13,11 @@ Dialog::Dialog(QWidget *parent) :
     QObject::connect(colorDialog, &QColorDialog::currentColorChanged,
                      this, &Dialog::setLightColor);
 
-    dirLightDirection.setX(ui->DirLightXSpinBox->value());
-    dirLightDirection.setY(ui->DirLightYSpinBox->value());
-    dirLightDirection.setZ(ui->DirLightZSpinBox->value());
+    auto range = ui->ZenithSlider->maximum() * ui->ZenithSlider->minimum();
+    zenith = ui->ZenithSlider->value() * M_PI / range;
+    range = ui->AzimuthSlider->maximum() * ui->AzimuthSlider->minimum();
+    azimuth =  ui->AzimuthSlider->value() * M_PI * 2.f / range;
+    updateDirLightDir();
     emit DirLightDirectionChanged(dirLightDirection);
 }
 
@@ -21,8 +25,6 @@ Dialog::~Dialog()
 {
     delete ui;
 }
-
-
 
 void Dialog::addMaterial(const QString& name)
 {
@@ -40,14 +42,6 @@ void Dialog::setLightColor(const QColor& color)
         DirLightColor = color;
         emit DirLightColorChanged(color);
         break;
-    case LightSources::Point:
-        PointLightColor = color;
-        emit PointLightColorChanged(color);
-        break;
-    case LightSources::Spot:
-        SpotLightColor = color;
-        emit SpotLightColorChanged(color);
-        break;
     }
 }
 
@@ -56,23 +50,6 @@ void Dialog::on_MaterialComboBox_currentIndexChanged(int index)
     emit ObjectMaterialChanged(index);
 }
 
-void Dialog::on_DirLightXSpinBox_valueChanged(double arg1)
-{
-    dirLightDirection.setX(arg1);
-    emit DirLightDirectionChanged(dirLightDirection);
-}
-
-void Dialog::on_DirLightYSpinBox_valueChanged(double arg1)
-{
-    dirLightDirection.setY(arg1);
-    emit DirLightDirectionChanged(dirLightDirection);
-}
-
-void Dialog::on_DirLightZSpinBox_valueChanged(double arg1)
-{
-    dirLightDirection.setZ(arg1);
-    emit DirLightDirectionChanged(dirLightDirection);
-}
 
 void Dialog::on_DirLightColorButton_clicked()
 {
@@ -81,67 +58,31 @@ void Dialog::on_DirLightColorButton_clicked()
     colorDialog->show();
 }
 
-void Dialog::on_PointLightColorButton_clicked()
-{
-    lightSource = LightSources::Point;
-    colorDialog->setCurrentColor(PointLightColor);
-    colorDialog->show();
-}
-
-void Dialog::on_PointLightConstSpinBox_valueChanged(double arg1)
-{
-    emit PointLightConstChanged(arg1);
-}
-
-void Dialog::on_PointLightLinSpinBox_valueChanged(double arg1)
-{
-    emit PointLightLinChanged(arg1);
-}
-
-void Dialog::on_PointLightQuadSpinBox_valueChanged(double arg1)
-{
-    emit PointLightQuadChanged(arg1);
-}
-
-void Dialog::on_SpotLightConstSpinBox_valueChanged(double arg1)
-{
-    emit SpotLightConstChanged(arg1);
-}
-
-void Dialog::on_SpotLightLinSpinBox_valueChanged(double arg1)
-{
-    emit SpotLightLinChanged(arg1);
-}
-
-void Dialog::on_SpotLightQuadSpinBox_valueChanged(double arg1)
-{
-    emit SpotLightQuadChanged(arg1);
-}
-
-void Dialog::on_CutOffSlider_valueChanged(int value)
-{
-    ui->CutOffVal->setNum(value);
-
-    emit CutOffChanged(value);
-}
-
-void Dialog::on_OuterCutOffSlider_valueChanged(int value)
-{
-    ui->OuterCutOffVal->setNum(value);
-
-    emit OuterCutOffChanged(value);
-}
-
-void Dialog::on_SpotLightColorButton_clicked()
-{
-    lightSource = LightSources::Spot;
-    colorDialog->setCurrentColor(SpotLightColor);
-    colorDialog->show();
-}
-
 void Dialog::on_AmbientColorButton_clicked()
 {
     lightSource = LightSources::Ambient;
     colorDialog->setCurrentColor(AmbientColor);
     colorDialog->show();
+}
+
+void Dialog::updateDirLightDir()
+{
+    dirLightDirection = QVector3D(qSin(azimuth) * qSin(zenith),
+                                  qCos(zenith), qCos(azimuth) * qSin(zenith));
+}
+
+void Dialog::on_AzimuthSlider_valueChanged(int value)
+{
+    auto range = ui->AzimuthSlider->maximum() - ui->AzimuthSlider->minimum();
+    azimuth = value * M_PI * 2.f / range;
+    updateDirLightDir();
+    emit DirLightDirectionChanged(dirLightDirection);
+}
+
+void Dialog::on_ZenithSlider_valueChanged(int value)
+{
+    auto range = ui->ZenithSlider->maximum() - ui->ZenithSlider->minimum();
+    zenith = value * M_PI / range;
+    updateDirLightDir();
+    emit DirLightDirectionChanged(dirLightDirection);
 }

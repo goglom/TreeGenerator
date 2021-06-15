@@ -3,23 +3,24 @@
 
 MeshObject::MeshObject(
         MeshSPtr mesh,
+        MaterialSPtr material,
         const QMatrix4x4& modelMatrix
         )
     : pMesh_(std::move(mesh)),
-      modelMatrix_(modelMatrix)
+      material_(std::move(material)),
+      modelMatrix(modelMatrix)
 {
-
 }
 
 MeshObjectSPtr MeshObject::construct(
         MeshSPtr mesh,
+        MaterialSPtr material,
         const QMatrix4x4& modelMatrix
         )
 {
-    return MeshObjectSPtr(new MeshObject(
-                              std::move(mesh),
-                              modelMatrix)
-                          );
+    return MeshObjectSPtr(
+                new MeshObject(std::move(mesh), std::move(material), modelMatrix)
+                );
 }
 
 RenderObjectSPtr MeshObject::clone() const
@@ -51,21 +52,23 @@ void MeshObject::initialize(OpenGLFunctionsSPtr pFunctions,
     // Vertex position
     pShader_->enableAttributeArray(positionLocation);
     pShader_->setAttributeBuffer(
-                positionLocation, Mesh::vertexType::positionElemTypeVal, offsetof(Mesh::vertexType, position),
+                positionLocation, Mesh::vertexType::positionElemTypeVal,
+                offsetof(Mesh::vertexType, position),
                 Mesh::vertexType::positionTupleSize, sizeof(Mesh::vertexType)
                 );
     // Vertex normal
     pShader_->enableAttributeArray(normalLocation);
-
     pShader_->setAttributeBuffer(
-                normalLocation, Mesh::vertexType::normalElemTypeVal, offsetof(Mesh::vertexType, normal),
+                normalLocation, Mesh::vertexType::normalElemTypeVal,
+                offsetof(Mesh::vertexType, normal),
                 Mesh::vertexType::normalTupleSize, sizeof(Mesh::vertexType)
                 );
     // Vertex Texture Coordinate
     // If there is no texture in MeshObject initialize don't load texture coordinates
     pShader_->enableAttributeArray(textCoordLocation);
     pShader_->setAttributeBuffer(
-                textCoordLocation, Mesh::vertexType::textCoordElemTypeVal, offsetof(Mesh::vertexType, textCoord),
+                textCoordLocation, Mesh::vertexType::textCoordElemTypeVal,
+                offsetof(Mesh::vertexType, textCoord),
                 Mesh::vertexType::textCoordTupleSize, sizeof(Mesh::vertexType)
                 );
 
@@ -80,14 +83,16 @@ void MeshObject::initialize(OpenGLFunctionsSPtr pFunctions,
 void MeshObject::render()
 {
     if (modelChanged_){
-        normModelMatrix_ = modelMatrix_.inverted().transposed();
+        normModelMatrix_ = modelMatrix.inverted().transposed();
         modelChanged_ = false;
     }
-    pShader_->bind();
-    pShader_->setUniformValue("model", modelMatrix_);
-    pShader_->setUniformValue("normModel", normModelMatrix_);
-
-
+    shader().bind();
+    shader().setUniformValue("model", modelMatrix);
+    shader().setUniformValue("normModel", normModelMatrix_);
+    shader().setUniformValue("material.ambient",    material_->ambient);
+    shader().setUniformValue("material.diffuse",    material_->diffuse);
+    shader().setUniformValue("material.specular",   material_->specular);
+    shader().setUniformValue("material.shininess",  material_->shininess);
 
     QOpenGLVertexArrayObject::Binder binder(VAO_.get());
     pFunctions_->glDrawElements(GL_TRIANGLES, pMesh_->indices.size(), Mesh::IndexTypeVal, nullptr);
@@ -96,12 +101,12 @@ void MeshObject::render()
 QMatrix4x4& MeshObject::getModel()
 {
     modelChanged_ = true;
-    return modelMatrix_;
+    return modelMatrix;
 }
 
 QMatrix4x4 const& MeshObject::getModel() const
 {
-    return modelMatrix_;
+    return modelMatrix;
 }
 
 void MeshObject::offsetMove(const QVector3D& offset)
@@ -118,7 +123,7 @@ void MeshObject::rotate(const QQuaternion& rotation)
 {
     QMatrix4x4 rot;
     rot.rotate(rotation);
-    getModel() = rot * getModel();
+    getModel().rotate(rotation);// = rot * getModel();
 }
 
 QVector3D MeshObject::position() const

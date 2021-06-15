@@ -1,12 +1,12 @@
 #pragma once
 
-#include <object.hpp>
+#include <movableobject.hpp>
 
 #include <QVector3D>
 #include <QMatrix4x4>
 #include <cmath>
 
-class CameraView final : public Object
+class CameraView final : public MovableObject
 {
     QMatrix4x4 view_{};
     QMatrix4x4 projection_{};

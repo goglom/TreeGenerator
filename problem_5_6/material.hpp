@@ -1,6 +1,8 @@
 #pragma once
 
 #include <QVector3D>
+#include <memory>
+
 
 struct Material
 {
@@ -20,3 +22,4 @@ struct Material
     }
 
 };
+using MaterialSPtr = std::shared_ptr<Material>;

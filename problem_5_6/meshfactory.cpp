@@ -1,6 +1,11 @@
 #include "meshfactory.hpp"
 #include <QMatrix4x4>
 #include <QtMath>
+#include <cmath>
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
+#include <iostream>
 
 std::shared_ptr<Mesh> MeshFactory::makeCube(const QVector3D& size, std::size_t grid_steps)
 {
@@ -138,4 +143,141 @@ std::shared_ptr<Mesh> MeshFactory::makeSphere(size_t stackCount, size_t sectorCo
     }
     return sphere;
 }
+
+MeshSPtr MeshFactory::makeRectangle(float width, float length)
+{
+    auto pRect = std::make_shared<Mesh>();
+    QVector3D norm = {0, 1, 0};
+
+    pRect->vertices.push_back(Vertex(QVector3D(0    , 0, 0     ), norm, {0    , 0}));
+    pRect->vertices.push_back(Vertex(QVector3D(width, 0, 0     ), norm, {1, 0}));
+    pRect->vertices.push_back(Vertex(QVector3D(width, 0, length), norm, {1, length}));
+    pRect->vertices.push_back(Vertex(QVector3D(0    , 0, length), norm, {0, length}));
+
+    pRect->indices = std::vector<Mesh::indexType>{0, 1, 2, 0, 2, 3};
+
+    return pRect;
+}
+
+MeshSPtr MeshFactory::makeFrustum(float radius1, float radius2, float length, size_t sectorCount)
+{
+    auto frustum = std::make_shared<Mesh>();
+    float sectorStep = 2 * M_PI / sectorCount;
+
+    for (size_t secNum = 0; secNum < sectorCount; ++secNum) {
+        float angle = sectorStep * secNum;
+        float x0 = std::cos(angle);
+        float z0 = std::sin(angle);
+        float x1 = radius1 * x0;
+        float z1 = radius1 * z0;
+        float x2 = radius2 * x0;
+        float z2 = radius2 * z0;
+        frustum->vertices.push_back(Vertex({z1, 0, x1}, {z0, 0, x0}));// Botom circle
+        frustum->vertices.push_back(Vertex({z2, length, x2}, {z0, 0, x0}));// Top circle
+    }
+    frustum->vertices.push_back(Vertex({0, 0, 0}, {0, -1, 0})); // Bottom face
+    frustum->vertices.push_back(Vertex({0, length,0}, {0, 1, 0})); // Top face
+    size_t indBottomCenter = frustum->vertices.size() - 2;
+    size_t indTopCenter = indBottomCenter + 1;
+
+    for (size_t i = 0; i < sectorCount; ++i) {
+        size_t k0 = 2 * i;
+        size_t k1 = k0 + 1;
+        size_t k2 = (k1 + 1) % (sectorCount * 2);
+        size_t k3 = k2 + 1;
+        // Side of the sector:
+        //  - first triangle of side
+        frustum->indices.push_back(k0);
+        frustum->indices.push_back(k1);
+        frustum->indices.push_back(k3);
+        //  - second triangle fo side
+        frustum->indices.push_back(k0);
+        frustum->indices.push_back(k3);
+        frustum->indices.push_back(k2);
+
+        // Sector of the bottom face:
+        frustum->indices.push_back(indBottomCenter);
+        frustum->indices.push_back(k0);
+        frustum->indices.push_back(k2);
+
+        // Sector of the top face:
+        frustum->indices.push_back(indTopCenter);
+        frustum->indices.push_back(k3);
+        frustum->indices.push_back(k1);
+    }
+    return frustum;
+}
+
+
+namespace  {
+
+MeshSPtr processMesh(aiMesh* mesh){
+    std::vector<Mesh::vertexType> vertices;
+    std::vector<Mesh::indexType> indices;
+
+    for (size_t i = 0; i < mesh->mNumVertices; i++)
+    {
+        Vertex vertex;
+
+        vertex.position.setX(mesh->mVertices[i].x);
+        vertex.position.setY(mesh->mVertices[i].y);
+        vertex.position.setZ(mesh->mVertices[i].z);
+
+        vertex.normal.setX(mesh->mNormals[i].x);
+        vertex.normal.setY(mesh->mNormals[i].y);
+        vertex.normal.setZ(mesh->mNormals[i].z);
+
+        vertex.tangent.setX(mesh->mTangents[i].x);
+        vertex.tangent.setY(mesh->mTangents[i].y);
+        vertex.tangent.setZ(mesh->mTangents[i].z);
+
+        vertex.biTangent.setX(mesh->mBitangents[i].x);
+        vertex.biTangent.setY(mesh->mBitangents[i].y);
+        vertex.biTangent.setZ(mesh->mBitangents[i].z);
+
+
+        vertex.textCoord.setX(mesh->mTextureCoords[0][i].x);
+        vertex.textCoord.setY(mesh->mTextureCoords[0][i].y);
+
+        vertices.push_back(vertex);
+    }
+
+    for (size_t i = 0; i < mesh->mNumFaces; ++i){
+        auto face = mesh->mFaces[i];
+
+        indices.insert(indices.end(), face.mIndices, face.mIndices + face.mNumIndices);
+
+//      indices.reserve(indices.size() + face.mNumIndices); //        for (size_t j = 0; j < face.mNumIndices; ++j){//            indices.push_back(face.mIndices[j]);//        }
+    }
+    return std::make_shared<Mesh>(std::move(vertices), std::move(indices));
+}
+
+void processNode(aiNode* node, aiScene const* scene, std::vector<MeshSPtr>& meshes){
+    for (size_t i = 0; i < node->mNumMeshes; ++i){
+        auto* mesh = scene->mMeshes[node->mMeshes[i]];
+        meshes.push_back(processMesh(mesh));
+    }
+    for (size_t i = 0; i < node->mNumChildren; ++i){
+        processNode(node->mChildren[i], scene, meshes);
+    }
+}
+
+}
+
+std::vector<MeshSPtr> MeshFactory::loadModel3D(const std::string& path)
+{
+    Assimp::Importer importer;
+
+    auto const* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace | aiProcess_GenNormals | aiProcess_GenUVCoords);
+
+    if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode){
+        qDebug() << "loadModel3D error: " << importer.GetErrorString();
+        return {};
+    }
+    std::vector<MeshSPtr> meshes;
+    processNode(scene->mRootNode, scene, meshes);
+
+    return meshes;
+}
+
 

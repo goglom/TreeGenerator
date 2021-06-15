@@ -3,7 +3,6 @@ CONFIG += c++17
 QT += core gui widgets
 TARGET = Problem5_6
 
-
 SOURCES += \
         cameraview.cpp \
         dialog.cpp \
@@ -11,16 +10,12 @@ SOURCES += \
         keyboard.cpp \
         main.cpp \
         mainwindow.cpp \
-        materialobject.cpp \
+        meshcollectionobject.cpp \
         meshfactory.cpp \
         meshobject.cpp \
-        objectsgrid.cpp \
-        pointlightsource.cpp \
         scene.cpp \
         scenewidget.cpp \
-        spotlightsource.cpp \
-        texture.cpp \
-        texturedobject.cpp
+        treebranch.cpp
 
 RESOURCES += \
     Resources.qrc
@@ -35,50 +30,45 @@ DISTFILES += \
 
 HEADERS += \
     cameraview.hpp \
-    cameraview.hpp \
-    dialog.hpp \
     dialog.hpp \
     direcltylight.hpp \
-    direcltylight.hpp \
-    glcolor.hpp \
     glcolor.hpp \
     keyboard.hpp \
-    keyboard.hpp \
-    lightsource.hpp \
     lightsource.hpp \
     mainwindow.hpp \
-    mainwindow.hpp \
-    material.hpp \
     material.hpp \
     materialfactory.hpp \
-    materialfactory.hpp \
-    materialobject.hpp \
-    materialobject.hpp \
     mesh.hpp \
-    mesh.hpp \
-    meshfactory.hpp \
+    meshcollectionobject.hpp \
     meshfactory.hpp \
     meshobject.hpp \
-    meshobject.hpp \
-    object.hpp \
-    object.hpp \
-    objectsgrid.hpp \
-    objectsgrid.hpp \
-    pointlightsource.hpp \
-    pointlightsource.hpp \
+    movableobject.hpp \
     renderobject.hpp \
-    renderobject.hpp \
-    renderobjectdecorator.hpp \
-    renderobjectdecorator.hpp \
-    scene.hpp \
     scene.hpp \
     scenewidget.hpp \
-    scenewidget.hpp \
-    spotlightsource.hpp \
-    spotlightsource.hpp \
-    texture.hpp \
-    texture.hpp \
-    texturedobject.hpp \
-    texturedobject.hpp \
+    treebranch.hpp \
     vertex.hpp \
-    vertex.hpp
+
+unix|win32: LIBS += -L$$PWD/../../../../../../../assimp-5.0.1/build/code/ -lassimp
+
+INCLUDEPATH += $$PWD/../../../../../../../assimp-5.0.1/build/include
+DEPENDPATH += $$PWD/../../../../../../../assimp-5.0.1/build/include
+
+win32:!win32-g++: PRE_TARGETDEPS += $$PWD/../../../../../../../assimp-5.0.1/build/code/assimp.lib
+else:unix|win32-g++: PRE_TARGETDEPS += $$PWD/../../../../../../../assimp-5.0.1/build/code/libassimp.a
+
+unix|win32: LIBS += -L$$PWD/../../../../../../../assimp-5.0.1/build/contrib/irrXML/ -lIrrXML
+
+INCLUDEPATH += $$PWD/../../../../../../../assimp-5.0.1/build/contrib/irrXML
+DEPENDPATH += $$PWD/../../../../../../../assimp-5.0.1/build/contrib/irrXML
+
+win32:!win32-g++: PRE_TARGETDEPS += $$PWD/../../../../../../../assimp-5.0.1/build/contrib/irrXML/IrrXML.lib
+else:unix|win32-g++: PRE_TARGETDEPS += $$PWD/../../../../../../../assimp-5.0.1/build/contrib/irrXML/libIrrXML.a
+
+unix|win32: LIBS += -L$$PWD/../../../../../../../assimp-5.0.1/build/contrib/zlib/ -lzlibstatic
+
+INCLUDEPATH += $$PWD/../../../../../../../assimp-5.0.1/build/contrib/zlib
+DEPENDPATH += $$PWD/../../../../../../../assimp-5.0.1/build/contrib/zlib
+
+win32:!win32-g++: PRE_TARGETDEPS += $$PWD/../../../../../../../assimp-5.0.1/build/contrib/zlib/zlibstatic.lib
+else:unix|win32-g++: PRE_TARGETDEPS += $$PWD/../../../../../../../assimp-5.0.1/build/contrib/zlib/libzlibstatic.a

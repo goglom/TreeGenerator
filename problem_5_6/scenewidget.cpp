@@ -50,13 +50,14 @@
 
 #include "scenewidget.hpp"
 #include "glcolor.hpp"
+#include "treebranch.hpp"
 
 #include <QImage>
 #include <QElapsedTimer>
 #include <QMouseEvent>
 #include <iostream>
 #include <cmath>
-
+#include <assimp/Importer.hpp>
 
 SceneWidget::SceneWidget(QWidget* parent)
      : QOpenGLWidget(parent)
@@ -84,88 +85,30 @@ void SceneWidget::setDirColor(const QColor& color)
     pDirLight->color = getGlColor(color);
 }
 
-void SceneWidget::setPointConst(float constant)
-{
-    pPointLight->constFactor = constant;
-}
-
-void SceneWidget::setPointLin(float linear)
-{
-    pPointLight->linFactor = linear;
-}
-
-void SceneWidget::setPointQuad(float quadric)
-{
-    pPointLight->quadFactor = quadric;
-}
-
-void SceneWidget::setPointInt(float intensity)
-{
-    pPointLight->intensity = intensity;
-}
-
-void SceneWidget::setPointColor(const QColor& color)
-{
-    pPointLight->color = getGlColor(color);
-}
-
-void SceneWidget::setSpotConst(float constant)
-{
-    pSpotLight->constFactor = constant;
-}
-
-void SceneWidget::setSpotLin(float linear)
-{
-    pSpotLight->linFactor = linear;
-}
-
-void SceneWidget::setSpotQuad(float quadric)
-{
-    pSpotLight->quadFactor = quadric;
-}
-
-void SceneWidget::setSpotInt(float intensity)
-{
-    pSpotLight->intensity = intensity;
-}
-
-void SceneWidget::setSpotColor(const QColor& color)
-{
-    pSpotLight->color = getGlColor(color);
-}
-
-void SceneWidget::setCutOff(float cutOff)
-{
-    pSpotLight->cutOff = qDegreesToRadians(cutOff);
-}
-
-void SceneWidget::setOuterCutOff(float outerCutOff)
-{
-
-    pSpotLight->outerCutOff = qDegreesToRadians(outerCutOff);
-}
-
 void SceneWidget::setObjectMaterial(int index)
 {
     baseMaterial = MaterialFactory::make(index);
     *pMaterial = baseMaterial;
 }
 
-void SceneWidget::selectPointLight()
+void SceneWidget::regrowTree()
 {
-    pDrivenObject = pPointLight;
+    regrowFlag = true;
 }
 
-void SceneWidget::setGridSteps(int steps)
+
+void SceneWidget::updateTree()
 {
-    pObjectsGrid->setColums(steps);
-    pObjectsGrid->setRows(steps);
+    tree = std::make_unique<TreeBranch>(treeParams);
+
+    for (size_t i = 0; i < treeGrowCycles; ++i){
+        tree->grow(treeFeedPortion);
+    }
+    scene.objects.erase(treeModel);
+    treeModel = tree->GenerateTreeMesh(pMaterial);
+    scene.addRenderObject(treeModel);
 }
 
-void SceneWidget::setGridStepLen(float length)
-{
-    pObjectsGrid->setStepLength(length);
-}
 
 void SceneWidget::setAmbientColor(const QColor& color)
 {
@@ -173,9 +116,9 @@ void SceneWidget::setAmbientColor(const QColor& color)
 }
 
 
-void SceneWidget::setDirDirection(QVector3D dir)
+void SceneWidget::setDirDirection(QVector3D const& dir)
 {
-    pDirLight->direction = dir;
+    pDirLight->direction = dir.normalized();
 }
 
 void SceneWidget::cleanup()
@@ -183,8 +126,6 @@ void SceneWidget::cleanup()
     scene.clean();
     pCamera.reset();
     pDrivenObject.reset();
-    pPointLight.reset();
-
 }
 
 void SceneWidget::mousePressEvent(QMouseEvent *e)
@@ -220,7 +161,7 @@ void SceneWidget::moveProcess()
     QVector3D direction;
 
     if (keyboard[Qt::Key_Shift]){
-        length *= 5.f;
+        length *= 3.f;
     }
     if (keyboard[Qt::Key_W]){
         direction += forward;
@@ -241,14 +182,6 @@ void SceneWidget::moveProcess()
         direction += downward;
     }
     pDrivenObject->offsetMove(direction * length);
-    pSpotLight->moveTo(pCamera->position());
-    pSpotLight->setDirection(pCamera->front());
-
-    QMatrix4x4 rotation;
-    rotation.rotate(pointLightAngluarSpeed * deltaTime, QVector3D{0, 1, 0});
-    pointLightPos = rotation * pointLightPos;
-    pPointLight->moveTo(pointLightPos);
-
 }
 
 void SceneWidget::wheelEvent(QWheelEvent* ev)
@@ -264,8 +197,18 @@ void SceneWidget::closeEvent(QCloseEvent* )
 
 void SceneWidget::timerEvent(QTimerEvent*)
 {
-    moveProcess(); // deltaTime in sec
-    update();
+    if (frameUpdateTimer.isActive()){
+        moveProcess();
+        update();
+        deltaTime = deltaTimer.elapsed() / 1000.f;
+        deltaTimer.restart();
+        framesCount++;
+        if (fpsTimer.elapsed() > 1000){
+            emit fpsChanged(framesCount + 1);
+            framesCount = 0;
+            fpsTimer.restart();
+        }
+    }
 }
 
 QSize SceneWidget::minimumSizeHint() const
@@ -286,72 +229,20 @@ void SceneWidget::initShaders()
     }
 }
 
-
-void SceneWidget::initTextures()
-{
-    pEarthTexture = std::make_shared<Texture>(
-                        QImage(":/Textures/Earth_Albedo.jpg"),
-                        "textureMap"
-                        );
-
-    pEarthTexture->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
-    pEarthTexture->setMagnificationFilter(QOpenGLTexture::Linear);
-
-    pEarthNormalMap = std::make_shared<Texture>(
-                          QImage(":/Textures/Earth_NormalMap.jpg"),
-                          "normalMap");
-
-    pEarthNormalMap->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
-    pEarthNormalMap->setMagnificationFilter(QOpenGLTexture::Linear);
-
-    pSunTexture = std::make_shared<Texture>(
-                          QImage(":/Textures/Sun_texture.jpg"),
-                          "textureMap");
-
-    pSunTexture->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
-    pSunTexture->setMagnificationFilter(QOpenGLTexture::Linear);
-}
-
 void SceneWidget::initScene()
 {
     scene.initialize(pFunc, pObjectShader, pLightShader);
-
     scene.setAmbientColor(ambientColor);
 
-    QMatrix4x4 model;
-    auto baseObject = std::make_shared<MaterialObject>(
-                          TexturedObject::construct(
-                              TexturedObject::construct(
-                                  MeshObject::construct(
-                                      MeshFactory::makeSphere(10, 10)),
-                                  pEarthNormalMap),
-                              pEarthTexture),
-                          pMaterial
-                      );
-    pObjectsGrid = std::make_shared<ObjectsGrid>(baseObject, GridStepLength, GridSteps, GridSteps);
-    scene.addRenderObject(pObjectsGrid);
-    model.setToIdentity();
-    model.translate(pointLightPos);
+    float size = 20;
+    auto plane = MeshObject::construct(MeshFactory::makeRectangle(size, size),
+                                       std::make_shared<Material>(MaterialFactory::Chrome));
+    plane->offsetMove({-size/2, 0, -size/2});
+    scene.addRenderObject(plane);
 
-    pPointLight = std::make_shared<PointLightSource>(
-                      TexturedObject::construct(
-                          MeshObject::construct(MeshFactory::makeSphere(50, 50, 20.f), model),
-                          pSunTexture),
-                      pointLightColor,
-                      1.f,
-                      0.6f,
-                      0.0f,
-                      0.0f
-                      );
 
-    scene.addPointLightSource(pPointLight);
     pDirLight = std::make_shared<DirecltyLightSource>(dirLightColor, DirLightIntensity, DirLightDirection);
     scene.addDirectlyLightSource(pDirLight);
-
-    pSpotLight = std::make_shared<SpotLightSource>(pCamera->position(), pCamera->front(),
-                                                   spotLightColor);
-    scene.addSpotLightSource(pSpotLight);
-
     pCamera->setZNear(zNear);
     pCamera->setZFar(zFar);
 }
@@ -365,21 +256,21 @@ void SceneWidget::setBackGroundColor()
                 1.f);
 }
 
+
 void SceneWidget::initializeGL()
 {
     pFunc->initializeOpenGLFunctions();
     initShaders();
-    initTextures();
     initScene();
     pFunc->glEnable(GL_DEPTH_TEST);
-    pFunc->glEnable(GL_CULL_FACE);
+    pFunc->glEnable(GL_MULTISAMPLE);
 
-    for (auto& [index, name] : MaterialFactory::names){
+    for (auto& [_, name] : MaterialFactory::materialMap){
         emit newMaterial(name);
     }
     fpsTimer.start();
     deltaTimer.start();
-    timer.start(deltaTimeMsec, this);
+    frameUpdateTimer.start(deltaTimeMsec, this);
 }
 
 
@@ -390,31 +281,19 @@ void SceneWidget::resizeGL(int w, int h)
 
 void SceneWidget::paintGL()
 {
-    // ---------------- Render block ------------------------------------------
+    if (regrowFlag){
+        updateTree();
+        regrowFlag = false;
+    }
+
     setBackGroundColor();
     pFunc->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     pCamera->setFOV(fov);
-
     pObjectShader->bind();
     pObjectShader->setUniformValue("projView",pCamera->getProjViewMatrix());
     pObjectShader->setUniformValue("cameraPos", pCamera->position());
-
     pLightShader->bind();
     pLightShader->setUniformValue("projView",pCamera->getProjViewMatrix());
-
     scene.renderAll();
-
-    //-------------------------------------------------------------------------
-
-    deltaTime = deltaTimer.elapsed() / 1000.f;
-    deltaTimer.restart();
-
-    framesCount++;
-    if (fpsTimer.elapsed() > 1000){
-        emit fpsChanged(framesCount + 1);
-        framesCount = 0;
-        fpsTimer.restart();
-    }
-
 }
 

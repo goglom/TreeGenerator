@@ -37,6 +37,12 @@ public:
         76.8f
     };
 
+    inline static constexpr Material Wood{
+        QVector3D(0.19125,	0.0735,	0.0225),
+        QVector3D(0.7038,	0.27048,	0.0828),
+        QVector3D(0.025,	0.013,	0.008),
+        5.8
+    };
 
     inline static constexpr Material Copper{
         QVector3D(0.19125,	0.0735,	0.0225),
@@ -57,28 +63,20 @@ public:
 //        QVector3D(),
 
 //    };
-    inline static const std::unordered_map<int, Material> materialMap =
+    inline static const std::vector<std::pair<Material, QString>> materialMap =
     {
-        {0, Gold},
-        {1, Jade},
-        {2, CyanPlastic},
-        {3, Chrome},
-        {4, Copper},
-        {5, YellowRubber}
+        {Wood, "Wood"},
+        {Copper, "Copper"},
+        {Chrome, "Chrome"},
+        {Gold, "Gold"},
+        {Jade, "Jade"},
+        {CyanPlastic, "Cyan Plastic"},
+        {YellowRubber, "YellowRubber"}
     };
 
-    inline static const std::map<int, QString> names =
-    {
-        {0, "Gold"},
-        {1, "Jade"},
-        {2, "Cyan Plastic"},
-        {3, "Chrome"},
-        {4, "Copper"},
-        {5, "YellowRubber"}
-    };
 
     inline static Material make(int index){
-        return materialMap.at(index);
+        return materialMap.at(index).first;
     }
 
 };

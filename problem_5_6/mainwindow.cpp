@@ -28,37 +28,21 @@ MainWindow::MainWindow(QWidget *parent) :
                      ui->Scene, &SceneWidget::setDirInt);
     QObject::connect(dialog, &Dialog::DirLightColorChanged,
                      ui->Scene, &SceneWidget::setDirColor);
-    QObject::connect(dialog, &Dialog::PointLightColorChanged,
-                     ui->Scene, &SceneWidget::setPointColor);
-    QObject::connect(dialog, &Dialog::SpotLightColorChanged,
-                     ui->Scene, &SceneWidget::setSpotColor);
     QObject::connect(dialog, &Dialog::DirLightDirectionChanged,
                      ui->Scene, &SceneWidget::setDirDirection);
-    QObject::connect(dialog, &Dialog::PointLightIntensityChanged,
-                     ui->Scene, &SceneWidget::setPointInt);
-    QObject::connect(dialog, &Dialog::PointLightConstChanged,
-                     ui->Scene, &SceneWidget::setPointConst);
-    QObject::connect(dialog, &Dialog::PointLightLinChanged,
-                     ui->Scene, &SceneWidget::setPointLin);
-    QObject::connect(dialog, &Dialog::PointLightQuadChanged,
-                     ui->Scene, &SceneWidget::setPointQuad);
-    QObject::connect(dialog, &Dialog::SpotLightIntensityChanged,
-                     ui->Scene, &SceneWidget::setSpotInt);
-    QObject::connect(dialog, &Dialog::SpotLightConstChanged,
-                     ui->Scene, &SceneWidget::setSpotConst);
-    QObject::connect(dialog, &Dialog::SpotLightLinChanged,
-                     ui->Scene, &SceneWidget::setSpotLin);
-    QObject::connect(dialog, &Dialog::SpotLightQuadChanged,
-                     ui->Scene, &SceneWidget::setSpotQuad);
-    QObject::connect(dialog, &Dialog::CutOffChanged,
-                     ui->Scene, &SceneWidget::setCutOff);
-    QObject::connect(dialog, &Dialog::OuterCutOffChanged,
-                     ui->Scene, &SceneWidget::setOuterCutOff);
 
     dialog->AmbientColor = getQColor(ui->Scene->ambientColor);
     dialog->DirLightColor = getQColor(ui->Scene->dirLightColor);
-    dialog->SpotLightColor = getQColor(ui->Scene->spotLightColor);
-    dialog->PointLightColor = getQColor(ui->Scene->pointLightColor);
+
+    ui->ParamsComboBox->addItem("Pass ratio");
+    ui->ParamsComboBox->addItem("Split decay");
+    ui->ParamsComboBox->addItem("Feed minimum");
+    ui->ParamsComboBox->addItem("Directedness");
+
+    activeParam = &treeParams().ratio;
+    addParamSets();
+    updateInterface();
+    on_RebuildTreeButton_clicked();
 }
 
 MainWindow::~MainWindow()
@@ -71,7 +55,107 @@ void MainWindow::on_SceneOptionsButton_clicked()
     dialog->show();
 }
 
-void MainWindow::on_doubleSpinBox_valueChanged(double arg1)
+void MainWindow::on_RebuildTreeButton_clicked()
 {
-    ui->Scene->setGridStepLen(arg1);
+    setTreeParams();
+    ui->Scene->regrowTree();
+}
+
+
+void MainWindow::on_EpochsSpinBox_valueChanged(int arg1)
+{
+    ui->Scene->treeGrowCycles = arg1;
+}
+
+void MainWindow::on_RatioDSpinBox_valueChanged(double arg1)
+{
+    treeParams().ratio = arg1;
+}
+
+void MainWindow::on_SpreadDSpinBox_valueChanged(double arg1)
+{
+    treeParams().spread = arg1;
+}
+
+void MainWindow::on_SplitsizeDSpinBox_valueChanged(double arg1)
+{
+    treeParams().splitsize = arg1;
+}
+
+void MainWindow::on_FeedDSpinBox_valueChanged(double arg1)
+{
+    ui->Scene->treeFeedPortion = arg1;
+}
+
+void MainWindow::setTreeParams()
+{
+    ui->Scene->treeParams = treeParams();
+}
+
+void MainWindow::addParamSets()
+{
+    for (size_t i = 0; i < treeParamsSet.size(); ++i){
+        ui->ParamsSetComboBox->addItem("Set " + QString::number(i + 1));
+    }
+}
+
+TreeBranch::Parametrs& MainWindow::treeParams()
+{
+    return treeParamsSet[curParamIdx];
+}
+
+void MainWindow::on_LeafsCheckBox_stateChanged(int arg1)
+{
+    treeParams().drawLeafs = arg1 == Qt::CheckState::Checked;
+}
+
+void MainWindow::on_LeafSizeDSpinBox_valueChanged(double arg1)
+{
+    treeParams().leafSize = arg1;
+}
+
+void MainWindow::on_ParamsComboBox_currentIndexChanged(int index)
+{
+    switch (index) {
+    case 0:
+        activeParam = &treeParams().passRatio;
+        break;
+    case 1:
+        activeParam = &treeParams().splitDecay;
+        break;
+    case 2:
+        activeParam = &treeParams().feedMin;
+        break;
+    case 3:
+        activeParam = &treeParams().directedness;
+        break;
+    }
+    ui->ParamsDSpinBox->setValue(*activeParam);
+}
+
+void MainWindow::on_ParamsDSpinBox_valueChanged(double arg1)
+{
+    *activeParam = arg1;
+}
+
+void MainWindow::updateInterface()
+{
+    ui->RatioDSpinBox->setValue(treeParams().ratio);
+    ui->RatioDSpinBox->setValue(treeParams().ratio);
+    ui->SplitsizeDSpinBox->setValue(treeParams().splitsize);
+    ui->LeafsCheckBox->setChecked(treeParams().drawLeafs);
+    ui->LeafSizeDSpinBox->setValue(treeParams().leafSize);
+    ui->ParamsDSpinBox->setValue(*activeParam);
+
+    //treeParams().ratio = ui->RatioDSpinBox->value();
+    //treeParams().spread = ui->SpreadDSpinBox->value();
+    //treeParams().splitsize = ui->SplitsizeDSpinBox->value();
+    //treeParams().drawLeafs = ui->LeafsCheckBox->checkState() == Qt::CheckState::Checked;
+    //treeParams().leafSize = ui->LeafSizeDSpinBox->value();
+}
+
+void MainWindow::on_ParamsSetComboBox_currentIndexChanged(int index)
+{
+    curParamIdx = index;
+    updateInterface();
 }
